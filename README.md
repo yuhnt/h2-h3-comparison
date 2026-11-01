@@ -12,6 +12,8 @@ packet loss, using two nginx servers on a Linux host and benchmark scripts on a 
 The report with results and the full configuration is in
 [`results-linux-server/report.html`](results-linux-server/report.html).
 
+**Demo video:** [`demo/result.mp4`](demo/result.mp4), a screen recording of the benchmark results.
+
 ---
 
 ## Test bed
@@ -90,6 +92,7 @@ SERVER_SSH=myadmin@10.0.10.140 ./run-benchmarks.sh 10.0.10.140
 │   ├── demo1-single-stream.sh
 │   ├── demo2-multi-stream.sh
 │   └── aioquic-get.py              # minimal aioquic HTTP/3 client used by Demo 1
+├── demo/result.mp4                 # screen recording of the benchmark results
 ├── results-linux-server/           # final CSVs, run log, report
 └── results/docker-desktop/         # earlier results from the Docker Desktop setup (not used in the report)
 ```
