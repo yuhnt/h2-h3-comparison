@@ -1,0 +1,22 @@
+  1     0.0 ms  C->S  1242  QUIC    Initial, PKN: 0, CRYPTO, CRYPTO, CRYPTO, CRYPTO, PING, PING, CRYPTO, CRYPTO, CRYPTO, CRYPTO, CRYPTO, CRYPTO, CRYPTO
+  2     0.0 ms  C->S  1242  QUIC    Initial, PKN: 1, PADDING, CRYPTO, CRYPTO, CRYPTO, CRYPTO, PADDING, CRYPTO, CRYPTO, CRYPTO, CRYPTO, CRYPTO, PADDING, CRYPTO, CRYPTO, PADDING
+  3    53.3 ms  S->C  1242  QUIC    Initial, PKN: 0, ACK, CRYPTO
+  4    53.4 ms  S->C  1242  QUIC    Handshake, PKN: 0, CRYPTO, CRYPTO
+  5    53.5 ms  S->C   560  QUIC    Handshake, PKN: 1, CRYPTO, CRYPTO, CRYPTO
+  6    57.0 ms  C->S  1242  QUIC    Handshake, PKN: 0, ACK, CRYPTO
+  7    57.2 ms  C->S  1448  QUIC    Protected Payload (KP0), PKN: 1, PING, PADDING
+  8    57.5 ms  C->S   142  HTTP3   Protected Payload (KP0), PKN: 2, MSD(0), STREAM(0), HEADERS: GET /resources/single/10kb.bin
+  9   109.1 ms  S->C  1242  HTTP3   Protected Payload (KP0), PKN: 0, ACK, CRYPTO, CRYPTO, DONE, NCI, STREAM(3), STREAM(3), SETTINGS, STREAM(7), STREAM(0), HEADERS: 200 OK
+ 10   109.1 ms  S->C  1242  QUIC    Protected Payload (KP0), PKN: 1, STREAM(0)
+ 11   109.2 ms  S->C  1242  QUIC    Protected Payload (KP0), PKN: 2, STREAM(0)
+ 12   109.2 ms  S->C  1242  QUIC    Protected Payload (KP0), PKN: 3, STREAM(0)
+ 13   109.3 ms  S->C  1242  QUIC    Protected Payload (KP0), PKN: 4, STREAM(0)
+ 14   109.4 ms  S->C  1242  QUIC    Protected Payload (KP0), PKN: 5, STREAM(0)
+ 15   109.4 ms  S->C  1242  QUIC    Protected Payload (KP0), PKN: 6, STREAM(0)
+ 16   109.4 ms  S->C  1242  QUIC    Protected Payload (KP0), PKN: 7, STREAM(0)
+ 17   109.5 ms  S->C  1242  QUIC    Protected Payload (KP0), PKN: 8, STREAM(0)
+ 18   109.5 ms  S->C   439  HTTP3   Protected Payload (KP0), PKN: 9, STREAM(0), DATA, STREAM(0)
+ 19   110.5 ms  C->S  1486  QUIC    Protected Payload (KP0), PKN: 3, PING, PADDING
+ 20   110.6 ms  C->S    85  QUIC    Protected Payload (KP0), PKN: 4, ACK
+ 21   111.0 ms  C->S    84  QUIC    Protected Payload (KP0), PKN: 5, CC
+ 22   161.1 ms  S->C    88  QUIC    Protected Payload (KP0), PKN: 10, ACK, MS

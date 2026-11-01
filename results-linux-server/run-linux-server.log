@@ -1,0 +1,390 @@
+[0;32mFull run against 10.0.10.140: 9 server conditions[0m
+  0ms    0%   -> demo1+demo2
+  0ms    2%   -> demo1+demo2
+  0ms    4%   -> demo2
+  0ms    8%   -> demo2
+  0ms    12%  -> demo2
+  25ms   0%   -> demo1
+  25ms   2%   -> demo1
+  50ms   0%   -> demo1
+  50ms   2%   -> demo1
+
+[0;32m===== Condition 1/9: Delay=0ms Loss=0% (demo1+demo2) =====[0m
+ Container h2-vs-h3-netem-run-91cc874ed932 Creating 
+ Container h2-vs-h3-netem-run-91cc874ed932 Created 
+[0;36m➜ Server set to Delay=0ms Loss=0%[0m
+[0;32m✓ Server check: first byte 7ms, consistent with 0ms delay[0m
+[0;36m=== Checking Client Tools on kali ===[0m
+✓ Curl: Available (curl 8.18.0)
+✓ Wget2 (HTTP/2): Available (GNU Wget2 2.2.0)
+✓ aioquic (HTTP/3 Python): Available (1.3.0 via /home/kali/Desktop/master/advanced_network/client/venv/bin/python)
+[1;33m- Quiche: skipped[0m
+Runs: 5 | Per-request timeout: 60s
+
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m========================================================================[0m
+[0;32m           SCENARIO 1: SINGLE-STREAM REQUEST BENCHMARK                  [0m
+[0;32m  Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m  Server condition (label): Delay=0ms Loss=0%[0m
+[0;32m  Clients: curl-h2 curl-h3 wget2 aioquic[0m
+[0;32m========================================================================[0m
+File       | Client   | Protocol  | Median (s) | Min-Max (s)       | Failed
+----------------------------------------------------------------
+10kb.bin   | Curl     | HTTP/2    | 0.0086     | 0.0064-0.0088     | 0
+10kb.bin   | Curl     | HTTP/3    | 0.0089     | 0.0084-0.0110     | 0
+10kb.bin   | Wget2    | HTTP/2    | 0.0050     | 0.0040-0.0060     | 0
+10kb.bin   | aioquic  | HTTP/3    | 0.0267     | 0.0168-0.1321     | 0
+----------------------------------------------------------------
+100kb.bin  | Curl     | HTTP/2    | 0.0100     | 0.0091-0.0121     | 0
+100kb.bin  | Curl     | HTTP/3    | 0.0137     | 0.0119-0.0150     | 0
+100kb.bin  | Wget2    | HTTP/2    | 0.0070     | 0.0050-0.0110     | 0
+100kb.bin  | aioquic  | HTTP/3    | 0.0313     | 0.0250-0.0495     | 0
+----------------------------------------------------------------
+1mb.bin    | Curl     | HTTP/2    | 0.0248     | 0.0234-0.0276     | 0
+1mb.bin    | Curl     | HTTP/3    | 0.0659     | 0.0423-0.0941     | 0
+1mb.bin    | Wget2    | HTTP/2    | 0.0290     | 0.0240-0.0350     | 0
+1mb.bin    | aioquic  | HTTP/3    | 0.1019     | 0.0959-0.1234     | 0
+----------------------------------------------------------------
+10mb.bin   | Curl     | HTTP/2    | 0.2120     | 0.1896-0.2199     | 0
+10mb.bin   | Curl     | HTTP/3    | 0.4749     | 0.4648-0.5178     | 0
+10mb.bin   | Wget2    | HTTP/2    | 0.2010     | 0.1850-0.2280     | 0
+10mb.bin   | aioquic  | HTTP/3    | 0.8275     | 0.7778-0.9637     | 0
+----------------------------------------------------------------
+
+[0;32m✓ Scenario 1 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo1_delay0ms_loss0pct.csv[0m
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m============================================================================[0m
+[0;32m   SCENARIO 2: MULTI-STREAM REQUEST (20 x 1MB) - HOL BLOCKING BENCHMARK[0m
+[0;32m   Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m   Server condition (label): Delay=0ms Loss=0%[0m
+[0;32m============================================================================[0m
+Proto   | Batch Time (s) | Per-Stream Avg (s) | Failed | Speedup
+----------------------------------------------------------------------------
+HTTP/2  | 0.4443         | 0.3377             | 0      | Base
+HTTP/3  | 0.6984         | 0.4592             | 0      | 0.64x
+
+[0;32m✓ Scenario 2 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo2_delay0ms_loss0pct.csv[0m
+
+[0;32m===== Condition 2/9: Delay=0ms Loss=2% (demo1+demo2) =====[0m
+ Container h2-vs-h3-netem-run-45296653c486 Creating 
+ Container h2-vs-h3-netem-run-45296653c486 Created 
+[0;36m➜ Server set to Delay=0ms Loss=2%[0m
+[0;32m✓ Server check: first byte 8ms, consistent with 0ms delay[0m
+[0;36m=== Checking Client Tools on kali ===[0m
+✓ Curl: Available (curl 8.18.0)
+✓ Wget2 (HTTP/2): Available (GNU Wget2 2.2.0)
+✓ aioquic (HTTP/3 Python): Available (1.3.0 via /home/kali/Desktop/master/advanced_network/client/venv/bin/python)
+[1;33m- Quiche: skipped[0m
+Runs: 5 | Per-request timeout: 60s
+
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m========================================================================[0m
+[0;32m           SCENARIO 1: SINGLE-STREAM REQUEST BENCHMARK                  [0m
+[0;32m  Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m  Server condition (label): Delay=0ms Loss=2%[0m
+[0;32m  Clients: curl-h2 curl-h3 wget2 aioquic[0m
+[0;32m========================================================================[0m
+File       | Client   | Protocol  | Median (s) | Min-Max (s)       | Failed
+----------------------------------------------------------------
+10kb.bin   | Curl     | HTTP/2    | 0.0081     | 0.0062-0.0101     | 0
+10kb.bin   | Curl     | HTTP/3    | 0.0125     | 0.0073-0.0254     | 0
+10kb.bin   | Wget2    | HTTP/2    | 0.0050     | 0.0050-0.0060     | 0
+10kb.bin   | aioquic  | HTTP/3    | 0.0236     | 0.0161-0.0308     | 0
+----------------------------------------------------------------
+100kb.bin  | Curl     | HTTP/2    | 0.0102     | 0.0079-0.0122     | 0
+100kb.bin  | Curl     | HTTP/3    | 0.0115     | 0.0097-0.0234     | 0
+100kb.bin  | Wget2    | HTTP/2    | 0.0110     | 0.0080-0.0110     | 0
+100kb.bin  | aioquic  | HTTP/3    | 0.0415     | 0.0297-0.0584     | 0
+----------------------------------------------------------------
+1mb.bin    | Curl     | HTTP/2    | 0.0347     | 0.0225-0.0784     | 0
+1mb.bin    | Curl     | HTTP/3    | 0.1180     | 0.0975-0.1675     | 0
+1mb.bin    | Wget2    | HTTP/2    | 0.0280     | 0.0220-0.0390     | 0
+1mb.bin    | aioquic  | HTTP/3    | 0.2684     | 0.1668-0.4335     | 0
+----------------------------------------------------------------
+10mb.bin   | Curl     | HTTP/2    | 0.6488     | 0.3231-1.3459     | 0
+10mb.bin   | Curl     | HTTP/3    | 1.1696     | 1.0380-1.2242     | 0
+10mb.bin   | Wget2    | HTTP/2    | 0.7100     | 0.1900-1.1300     | 0
+10mb.bin   | aioquic  | HTTP/3    | 3.4827     | 3.1541-3.7071     | 0
+----------------------------------------------------------------
+
+[0;32m✓ Scenario 1 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo1_delay0ms_loss2pct.csv[0m
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m============================================================================[0m
+[0;32m   SCENARIO 2: MULTI-STREAM REQUEST (20 x 1MB) - HOL BLOCKING BENCHMARK[0m
+[0;32m   Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m   Server condition (label): Delay=0ms Loss=2%[0m
+[0;32m============================================================================[0m
+Proto   | Batch Time (s) | Per-Stream Avg (s) | Failed | Speedup
+----------------------------------------------------------------------------
+HTTP/2  | 0.5583         | 0.3219             | 0      | Base
+HTTP/3  | 0.7509         | 0.6147             | 0      | 0.74x
+
+[0;32m✓ Scenario 2 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo2_delay0ms_loss2pct.csv[0m
+
+[0;32m===== Condition 3/9: Delay=0ms Loss=4% (demo2) =====[0m
+ Container h2-vs-h3-netem-run-6f0725673d53 Creating 
+ Container h2-vs-h3-netem-run-6f0725673d53 Created 
+[0;36m➜ Server set to Delay=0ms Loss=4%[0m
+[0;32m✓ Server check: first byte 7ms, consistent with 0ms delay[0m
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m============================================================================[0m
+[0;32m   SCENARIO 2: MULTI-STREAM REQUEST (20 x 1MB) - HOL BLOCKING BENCHMARK[0m
+[0;32m   Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m   Server condition (label): Delay=0ms Loss=4%[0m
+[0;32m============================================================================[0m
+Proto   | Batch Time (s) | Per-Stream Avg (s) | Failed | Speedup
+----------------------------------------------------------------------------
+HTTP/2  | 1.1970         | 0.3780             | 0      | Base
+HTTP/3  | 0.8025         | 0.6741             | 0      | 1.49x
+
+[0;32m✓ Scenario 2 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo2_delay0ms_loss4pct.csv[0m
+
+[0;32m===== Condition 4/9: Delay=0ms Loss=8% (demo2) =====[0m
+ Container h2-vs-h3-netem-run-2e071016dfcb Creating 
+ Container h2-vs-h3-netem-run-2e071016dfcb Created 
+[0;36m➜ Server set to Delay=0ms Loss=8%[0m
+[0;32m✓ Server check: first byte 5ms, consistent with 0ms delay[0m
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m============================================================================[0m
+[0;32m   SCENARIO 2: MULTI-STREAM REQUEST (20 x 1MB) - HOL BLOCKING BENCHMARK[0m
+[0;32m   Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m   Server condition (label): Delay=0ms Loss=8%[0m
+[0;32m============================================================================[0m
+Proto   | Batch Time (s) | Per-Stream Avg (s) | Failed | Speedup
+----------------------------------------------------------------------------
+HTTP/2  | 2.8962         | 0.9544             | 0      | Base
+HTTP/3  | 0.9001         | 0.5848             | 0      | 3.22x
+
+[0;32m✓ Scenario 2 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo2_delay0ms_loss8pct.csv[0m
+
+[0;32m===== Condition 5/9: Delay=0ms Loss=12% (demo2) =====[0m
+ Container h2-vs-h3-netem-run-0d68d7db1c98 Creating 
+ Container h2-vs-h3-netem-run-0d68d7db1c98 Created 
+[0;36m➜ Server set to Delay=0ms Loss=12%[0m
+[0;32m✓ Server check: first byte 9ms, consistent with 0ms delay[0m
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m============================================================================[0m
+[0;32m   SCENARIO 2: MULTI-STREAM REQUEST (20 x 1MB) - HOL BLOCKING BENCHMARK[0m
+[0;32m   Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m   Server condition (label): Delay=0ms Loss=12%[0m
+[0;32m============================================================================[0m
+Proto   | Batch Time (s) | Per-Stream Avg (s) | Failed | Speedup
+----------------------------------------------------------------------------
+HTTP/2  | 4.5871         | 2.2717             | 0      | Base
+HTTP/3  | 0.9975         | 0.6430             | 0      | 4.60x
+
+[0;32m✓ Scenario 2 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo2_delay0ms_loss12pct.csv[0m
+
+[0;32m===== Condition 6/9: Delay=25ms Loss=0% (demo1) =====[0m
+ Container h2-vs-h3-netem-run-5dc65cd31688 Creating 
+ Container h2-vs-h3-netem-run-5dc65cd31688 Created 
+[0;36m➜ Server set to Delay=25ms Loss=0%[0m
+[0;32m✓ Server check: first byte 86ms, consistent with 25ms delay[0m
+[0;36m=== Checking Client Tools on kali ===[0m
+✓ Curl: Available (curl 8.18.0)
+✓ Wget2 (HTTP/2): Available (GNU Wget2 2.2.0)
+✓ aioquic (HTTP/3 Python): Available (1.3.0 via /home/kali/Desktop/master/advanced_network/client/venv/bin/python)
+[1;33m- Quiche: skipped[0m
+Runs: 5 | Per-request timeout: 60s
+
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m========================================================================[0m
+[0;32m           SCENARIO 1: SINGLE-STREAM REQUEST BENCHMARK                  [0m
+[0;32m  Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m  Server condition (label): Delay=25ms Loss=0%[0m
+[0;32m  Clients: curl-h2 curl-h3 wget2 aioquic[0m
+[0;32m========================================================================[0m
+File       | Client   | Protocol  | Median (s) | Min-Max (s)       | Failed
+----------------------------------------------------------------
+10kb.bin   | Curl     | HTTP/2    | 0.1132     | 0.1111-0.1161     | 0
+10kb.bin   | Curl     | HTTP/3    | 0.0622     | 0.0592-0.0633     | 0
+10kb.bin   | Wget2    | HTTP/2    | 0.0820     | 0.0800-0.0830     | 0
+10kb.bin   | aioquic  | HTTP/3    | 0.0756     | 0.0725-0.0837     | 0
+----------------------------------------------------------------
+100kb.bin  | Curl     | HTTP/2    | 0.1644     | 0.1621-0.1689     | 0
+100kb.bin  | Curl     | HTTP/3    | 0.1431     | 0.1406-0.1445     | 0
+100kb.bin  | Wget2    | HTTP/2    | 0.1360     | 0.1350-0.1380     | 0
+100kb.bin  | aioquic  | HTTP/3    | 0.1638     | 0.1537-0.1660     | 0
+----------------------------------------------------------------
+1mb.bin    | Curl     | HTTP/2    | 0.2584     | 0.2468-0.2714     | 0
+1mb.bin    | Curl     | HTTP/3    | 0.2417     | 0.2327-0.2620     | 0
+1mb.bin    | Wget2    | HTTP/2    | 0.2230     | 0.2140-0.2260     | 0
+1mb.bin    | aioquic  | HTTP/3    | 0.3066     | 0.2849-0.3111     | 0
+----------------------------------------------------------------
+10mb.bin   | Curl     | HTTP/2    | 0.8960     | 0.4290-1.0173     | 0
+10mb.bin   | Curl     | HTTP/3    | 0.8426     | 0.4918-2.9938     | 0
+10mb.bin   | Wget2    | HTTP/2    | 0.7970     | 0.4800-1.0460     | 0
+10mb.bin   | aioquic  | HTTP/3    | 1.3862     | 1.2737-1.8116     | 0
+----------------------------------------------------------------
+
+[0;32m✓ Scenario 1 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo1_delay25ms_loss0pct.csv[0m
+
+[0;32m===== Condition 7/9: Delay=25ms Loss=2% (demo1) =====[0m
+ Container h2-vs-h3-netem-run-48ac9b2a1edf Creating 
+ Container h2-vs-h3-netem-run-48ac9b2a1edf Created 
+[0;36m➜ Server set to Delay=25ms Loss=2%[0m
+[0;32m✓ Server check: first byte 85ms, consistent with 25ms delay[0m
+[0;36m=== Checking Client Tools on kali ===[0m
+✓ Curl: Available (curl 8.18.0)
+✓ Wget2 (HTTP/2): Available (GNU Wget2 2.2.0)
+✓ aioquic (HTTP/3 Python): Available (1.3.0 via /home/kali/Desktop/master/advanced_network/client/venv/bin/python)
+[1;33m- Quiche: skipped[0m
+Runs: 5 | Per-request timeout: 60s
+
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m========================================================================[0m
+[0;32m           SCENARIO 1: SINGLE-STREAM REQUEST BENCHMARK                  [0m
+[0;32m  Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m  Server condition (label): Delay=25ms Loss=2%[0m
+[0;32m  Clients: curl-h2 curl-h3 wget2 aioquic[0m
+[0;32m========================================================================[0m
+File       | Client   | Protocol  | Median (s) | Min-Max (s)       | Failed
+----------------------------------------------------------------
+10kb.bin   | Curl     | HTTP/2    | 0.1142     | 0.1117-0.4827     | 0
+10kb.bin   | Curl     | HTTP/3    | 0.0615     | 0.0598-0.0905     | 0
+10kb.bin   | Wget2    | HTTP/2    | 0.0840     | 0.0830-0.3420     | 0
+10kb.bin   | aioquic  | HTTP/3    | 0.0778     | 0.0708-0.0856     | 0
+----------------------------------------------------------------
+100kb.bin  | Curl     | HTTP/2    | 0.1678     | 0.1648-0.3486     | 0
+100kb.bin  | Curl     | HTTP/3    | 0.2380     | 0.1692-0.4330     | 0
+100kb.bin  | Wget2    | HTTP/2    | 0.1390     | 0.1370-0.6110     | 0
+100kb.bin  | aioquic  | HTTP/3    | 0.1874     | 0.1623-0.2441     | 0
+----------------------------------------------------------------
+1mb.bin    | Curl     | HTTP/2    | 0.7946     | 0.2856-1.5483     | 0
+1mb.bin    | Curl     | HTTP/3    | 2.7949     | 0.2643-3.5192     | 0
+1mb.bin    | Wget2    | HTTP/2    | 0.6880     | 0.3910-1.7330     | 0
+1mb.bin    | aioquic  | HTTP/3    | 1.0551     | 0.4490-2.5305     | 0
+----------------------------------------------------------------
+10mb.bin   | Curl     | HTTP/2    | 18.7836    | 10.2844-21.6740   | 0
+10mb.bin   | Curl     | HTTP/3    | 33.7877    | 29.3714-35.3046   | 0
+10mb.bin   | Wget2    | HTTP/2    | 15.4670    | 8.1050-22.1170    | 0
+10mb.bin   | aioquic  | HTTP/3    | 26.6068    | 25.5555-28.4708   | 0
+----------------------------------------------------------------
+
+[0;32m✓ Scenario 1 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo1_delay25ms_loss2pct.csv[0m
+
+[0;32m===== Condition 8/9: Delay=50ms Loss=0% (demo1) =====[0m
+ Container h2-vs-h3-netem-run-5a1cc846223a Creating 
+ Container h2-vs-h3-netem-run-5a1cc846223a Created 
+[0;36m➜ Server set to Delay=50ms Loss=0%[0m
+[0;32m✓ Server check: first byte 161ms, consistent with 50ms delay[0m
+[0;36m=== Checking Client Tools on kali ===[0m
+✓ Curl: Available (curl 8.18.0)
+✓ Wget2 (HTTP/2): Available (GNU Wget2 2.2.0)
+✓ aioquic (HTTP/3 Python): Available (1.3.0 via /home/kali/Desktop/master/advanced_network/client/venv/bin/python)
+[1;33m- Quiche: skipped[0m
+Runs: 5 | Per-request timeout: 60s
+
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m========================================================================[0m
+[0;32m           SCENARIO 1: SINGLE-STREAM REQUEST BENCHMARK                  [0m
+[0;32m  Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m  Server condition (label): Delay=50ms Loss=0%[0m
+[0;32m  Clients: curl-h2 curl-h3 wget2 aioquic[0m
+[0;32m========================================================================[0m
+File       | Client   | Protocol  | Median (s) | Min-Max (s)       | Failed
+----------------------------------------------------------------
+10kb.bin   | Curl     | HTTP/2    | 0.2130     | 0.2106-0.2144     | 0
+10kb.bin   | Curl     | HTTP/3    | 0.1152     | 0.1102-0.1156     | 0
+10kb.bin   | Wget2    | HTTP/2    | 0.1580     | 0.1560-0.1590     | 0
+10kb.bin   | aioquic  | HTTP/3    | 0.1275     | 0.1229-0.1333     | 0
+----------------------------------------------------------------
+100kb.bin  | Curl     | HTTP/2    | 0.3163     | 0.3136-0.3202     | 0
+100kb.bin  | Curl     | HTTP/3    | 0.2695     | 0.2678-0.2848     | 0
+100kb.bin  | Wget2    | HTTP/2    | 0.2620     | 0.2600-0.2640     | 0
+100kb.bin  | aioquic  | HTTP/3    | 0.2920     | 0.2869-0.2944     | 0
+----------------------------------------------------------------
+1mb.bin    | Curl     | HTTP/2    | 0.4904     | 0.4817-0.5396     | 0
+1mb.bin    | Curl     | HTTP/3    | 0.4440     | 0.4432-0.5425     | 0
+1mb.bin    | Wget2    | HTTP/2    | 0.4180     | 0.4170-0.4340     | 0
+1mb.bin    | aioquic  | HTTP/3    | 0.5638     | 0.5015-0.6402     | 0
+----------------------------------------------------------------
+10mb.bin   | Curl     | HTTP/2    | 1.2769     | 0.9078-1.5283     | 0
+10mb.bin   | Curl     | HTTP/3    | 3.7043     | 0.7258-5.1223     | 0
+10mb.bin   | Wget2    | HTTP/2    | 1.3750     | 0.6900-1.6800     | 0
+10mb.bin   | aioquic  | HTTP/3    | 2.3216     | 2.0994-2.4759     | 0
+----------------------------------------------------------------
+
+[0;32m✓ Scenario 1 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo1_delay50ms_loss0pct.csv[0m
+
+[0;32m===== Condition 9/9: Delay=50ms Loss=2% (demo1) =====[0m
+ Container h2-vs-h3-netem-run-e4afdfd07e4f Creating 
+ Container h2-vs-h3-netem-run-e4afdfd07e4f Created 
+[0;36m➜ Server set to Delay=50ms Loss=2%[0m
+[0;32m✓ Server check: first byte 160ms, consistent with 50ms delay[0m
+[0;36m=== Checking Client Tools on kali ===[0m
+✓ Curl: Available (curl 8.18.0)
+✓ Wget2 (HTTP/2): Available (GNU Wget2 2.2.0)
+✓ aioquic (HTTP/3 Python): Available (1.3.0 via /home/kali/Desktop/master/advanced_network/client/venv/bin/python)
+[1;33m- Quiche: skipped[0m
+Runs: 5 | Per-request timeout: 60s
+
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m========================================================================[0m
+[0;32m           SCENARIO 1: SINGLE-STREAM REQUEST BENCHMARK                  [0m
+[0;32m  Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m  Server condition (label): Delay=50ms Loss=2%[0m
+[0;32m  Clients: curl-h2 curl-h3 wget2 aioquic[0m
+[0;32m========================================================================[0m
+File       | Client   | Protocol  | Median (s) | Min-Max (s)       | Failed
+----------------------------------------------------------------
+10kb.bin   | Curl     | HTTP/2    | 0.2147     | 0.2115-0.2162     | 0
+10kb.bin   | Curl     | HTTP/3    | 0.1152     | 0.1108-0.1659     | 0
+10kb.bin   | Wget2    | HTTP/2    | 0.1580     | 0.1560-0.1600     | 0
+10kb.bin   | aioquic  | HTTP/3    | 0.1288     | 0.1241-0.1363     | 0
+----------------------------------------------------------------
+100kb.bin  | Curl     | HTTP/2    | 0.3179     | 0.3161-0.3684     | 0
+100kb.bin  | Curl     | HTTP/3    | 0.4550     | 0.3199-0.5775     | 0
+100kb.bin  | Wget2    | HTTP/2    | 0.2630     | 0.2600-0.7790     | 0
+100kb.bin  | aioquic  | HTTP/3    | 0.3524     | 0.2938-0.5087     | 0
+----------------------------------------------------------------
+1mb.bin    | Curl     | HTTP/2    | 2.1143     | 0.4739-2.6507     | 0
+1mb.bin    | Curl     | HTTP/3    | 6.1254     | 5.3858-6.6400     | 0
+1mb.bin    | Wget2    | HTTP/2    | 3.4390     | 0.7420-4.1290     | 0
+1mb.bin    | aioquic  | HTTP/3    | 4.6388     | 3.0249-6.0495     | 0
+----------------------------------------------------------------
+10mb.bin   | Curl     | HTTP/2    | 33.1440    | 30.4993-43.7074   | 0
+10mb.bin   | Curl     | HTTP/3    | 58.5599    | 58.5599-58.5599   | 4
+10mb.bin   | Wget2    | HTTP/2    | 36.2230    | 32.9540-38.4730   | 0
+10mb.bin   | aioquic  | HTTP/3    | 52.5612    | 48.8212-52.9440   | 0
+----------------------------------------------------------------
+
+[0;32m✓ Scenario 1 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo1_delay50ms_loss2pct.csv[0m
+
+[0;32m✓ Full run completed. Results: /home/kali/Desktop/master/advanced_network/client/results-*.csv[0m
+ Container h2-vs-h3-netem-run-ec73f058c857 Creating 
+ Container h2-vs-h3-netem-run-ec73f058c857 Created 
+[0;32m✓ Server network reset[0m

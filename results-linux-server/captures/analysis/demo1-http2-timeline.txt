@@ -1,0 +1,39 @@
+  1     0.0 ms  C->S    74  TCP     51888 → 8443 [SYN] Seq=0 Win=32120 Len=0 MSS=1460 SACK_PERM WS=128
+  2    50.4 ms  S->C    74  TCP     8443 → 51888 [SYN, ACK] Seq=0 Ack=1 Win=65160 Len=0 MSS=1460 SACK_PERM WS=512
+  3    51.1 ms  C->S    66  TCP     51888 → 8443 [ACK] Seq=1 Ack=1 Win=32128 Len=0
+  4    57.3 ms  C->S  1514  TCP     [TCP segment of a reassembled PDU]
+  5    57.3 ms  C->S   293  TLSv1   Client Hello
+  6   107.6 ms  S->C    66  TCP     8443 → 51888 [ACK] Seq=1 Ack=1449 Win=68096 Len=0
+  7   107.7 ms  S->C    66  TCP     8443 → 51888 [ACK] Seq=1 Ack=1676 Win=71168 Len=0
+  8   110.5 ms  S->C  1514  TLSv1.3 Server Hello, Change Cipher Spec, Encrypted Extensions
+  9   110.7 ms  S->C  1243  TLSv1.3 Certificate, Certificate Verify, Finished
+ 10   111.1 ms  C->S    66  TCP     51888 → 8443 [ACK] Seq=1676 Ack=2626 Win=31872 Len=0
+ 11   112.5 ms  C->S   146  TLSv1.3 Change Cipher Spec, Finished
+ 12   113.3 ms  C->S   213  HTTP2   Magic, SETTINGS[0], WINDOW_UPDATE[0], HEADERS[1]: GET /resources/single/10kb.bin
+ 13   113.5 ms  C->S   114  HTTP2   WINDOW_UPDATE[1], WINDOW_UPDATE[1]
+ 14   166.0 ms  S->C   145  TLSv1.3 New Session Ticket
+ 15   166.3 ms  S->C   145  TLSv1.3 New Session Ticket
+ 16   166.7 ms  S->C   443  HTTP2   SETTINGS[0], WINDOW_UPDATE[0], SETTINGS[0], HEADERS[1]: 200 OK
+ 17   167.4 ms  C->S    66  TCP     51888 → 8443 [ACK] Seq=1951 Ack=2784 Win=31872 Len=0
+ 18   167.7 ms  S->C  1514  TCP     [TCP segment of a reassembled PDU]
+ 19   167.8 ms  S->C  1514  TCP     8443 → 51888 [PSH, ACK] Seq=4609 Ack=1951 Win=74240 Len=1448 [TCP segment of a reassembled PDU]
+ 20   167.9 ms  S->C  1514  TCP     8443 → 51888 [ACK] Seq=6057 Ack=1951 Win=74240 Len=1448 [TCP segment of a reassembled PDU]
+ 21   167.9 ms  S->C  1514  TCP     8443 → 51888 [PSH, ACK] Seq=7505 Ack=1951 Win=74240 Len=1448 [TCP segment of a reassembled PDU]
+ 22   168.0 ms  S->C  1514  TCP     8443 → 51888 [ACK] Seq=8953 Ack=1951 Win=74240 Len=1448 [TCP segment of a reassembled PDU]
+ 23   168.1 ms  S->C  1514  TCP     8443 → 51888 [PSH, ACK] Seq=10401 Ack=1951 Win=74240 Len=1448 [TCP segment of a reassembled PDU]
+ 24   168.3 ms  S->C  1514  TCP     8443 → 51888 [ACK] Seq=11849 Ack=1951 Win=74240 Len=1448 [TCP segment of a reassembled PDU]
+ 25   168.5 ms  C->S    97  HTTP2   SETTINGS[0]
+ 26   168.5 ms  C->S    66  TCP     51888 → 8443 [ACK] Seq=1982 Ack=6057 Win=31872 Len=0
+ 27   168.5 ms  C->S    66  TCP     51888 → 8443 [ACK] Seq=1982 Ack=8953 Win=31872 Len=0
+ 28   168.5 ms  C->S    66  TCP     51888 → 8443 [ACK] Seq=1982 Ack=11849 Win=31872 Len=0
+ 29   211.4 ms  C->S    66  TCP     51888 → 8443 [ACK] Seq=1982 Ack=13297 Win=31872 Len=0
+ 30   217.6 ms  S->C   210  HTTP2   DATA[1], DATA[1]
+ 31   218.1 ms  C->S    66  TCP     51888 → 8443 [ACK] Seq=1982 Ack=13441 Win=31872 Len=0
+ 32   218.6 ms  C->S   114  HTTP2   GOAWAY[0]
+ 33   218.7 ms  C->S    90  TLSv1.3 Alert (Level: Warning, Description: Close Notify)
+ 34   218.9 ms  C->S    66  TCP     51888 → 8443 [FIN, ACK] Seq=2054 Ack=13441 Win=31872 Len=0
+ 35   259.5 ms  S->C    66  TCP     8443 → 51888 [ACK] Seq=13441 Ack=1982 Win=74240 Len=0
+ 36   268.9 ms  S->C    66  TCP     8443 → 51888 [ACK] Seq=13441 Ack=2030 Win=74240 Len=0
+ 37   269.0 ms  S->C    66  TCP     8443 → 51888 [ACK] Seq=13441 Ack=2054 Win=74240 Len=0
+ 38   269.7 ms  S->C    66  TCP     8443 → 51888 [FIN, ACK] Seq=13441 Ack=2055 Win=74240 Len=0
+ 39   270.1 ms  C->S    66  TCP     51888 → 8443 [ACK] Seq=2055 Ack=13442 Win=31872 Len=0

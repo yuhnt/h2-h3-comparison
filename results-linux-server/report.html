@@ -1,0 +1,1197 @@
+<title>HTTP/2 vs HTTP/3 Under Delay and Loss</title>
+<meta name="description" content="Measurement report: HTTP/2 and HTTP/3 download times under emulated delay and packet loss on a Linux server test bed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400&display=swap">
+<style>
+  :root {
+    --ground: #F5F7FA;
+    --surface: #FFFFFF;
+    --ink: #16202C;
+    --ink-2: #364252;
+    --muted: #5A6676;
+    --rule: #DCE2EA;
+    --rule-strong: #AEB8C5;
+    --h2: #4B4FC4;
+    --h3: #C8641A;
+    --h2-tint: #E9E8FB;
+    --h3-tint: #FBEBDD;
+    --d0: #7FA6C4;
+    --d1: #3F76A3;
+    --d2: #133E66;
+    --link: #3D41A8;
+    --code-bg: #EBEFF4;
+    --code-ink: #22303F;
+    --code-comment: #6B7686;
+    --tip-bg: #16202C;
+    --tip-ink: #F5F7FA;
+    --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+    --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #121820;
+      --surface: #18212C;
+      --ink: #E4E9F0;
+      --ink-2: #C4CDD8;
+      --muted: #95A1B0;
+      --rule: #28323E;
+      --rule-strong: #46525F;
+      --h2: #7C82E6;
+      --h3: #CC7A33;
+      --h2-tint: #262A52;
+      --h3-tint: #3B2716;
+      --d0: #2F6C9C;
+      --d1: #62A0CF;
+      --d2: #B5D6EE;
+      --link: #9EA3F2;
+      --code-bg: #1E2833;
+      --code-ink: #D5DDE7;
+      --code-comment: #8A96A6;
+      --tip-bg: #E4E9F0;
+      --tip-ink: #121820;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #121820;
+    --surface: #18212C;
+    --ink: #E4E9F0;
+    --ink-2: #C4CDD8;
+    --muted: #95A1B0;
+    --rule: #28323E;
+    --rule-strong: #46525F;
+    --h2: #7C82E6;
+    --h3: #CC7A33;
+    --h2-tint: #262A52;
+    --h3-tint: #3B2716;
+    --d0: #2F6C9C;
+    --d1: #62A0CF;
+    --d2: #B5D6EE;
+    --link: #9EA3F2;
+    --code-bg: #1E2833;
+    --code-ink: #D5DDE7;
+    --code-comment: #8A96A6;
+    --tip-bg: #E4E9F0;
+    --tip-ink: #121820;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 400 17px/1.62 var(--f-body);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--link); text-underline-offset: 2px; }
+  p, ul, ol, dl, dd, figure, pre, h1, h2, h3, h4 { margin: 0; }
+  ul { padding-left: 1.2em; display: flex; flex-direction: column; gap: 0.5em; }
+
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: clamp(24px, 5vw, 64px) clamp(16px, 4vw, 40px) 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 72px;
+  }
+  .prose { max-width: 68ch; display: flex; flex-direction: column; gap: 1em; }
+
+  h1, h2, h3, h4, .fig-title {
+    font-family: var(--f-display);
+    color: var(--ink);
+    text-wrap: balance;
+    line-height: 1.12;
+  }
+  h1 { font-size: clamp(2.2rem, 5vw, 3.35rem); font-weight: 760; font-stretch: 82%; letter-spacing: -0.012em; }
+  h2 { font-size: 1.7rem; font-weight: 700; font-stretch: 85%; }
+  h3 { font-size: 1.12rem; font-weight: 650; font-stretch: 92%; line-height: 1.25; }
+  h4 { font-size: 0.98rem; font-weight: 650; font-stretch: 92%; line-height: 1.25; }
+
+  .eyebrow {
+    font: 500 12px/1.3 var(--f-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  code {
+    font-family: var(--f-mono);
+    font-size: 0.86em;
+    background: var(--code-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 14px 16px;
+    overflow-x: auto;
+    font: 12.5px/1.65 var(--f-mono);
+    border-radius: 4px;
+    tab-size: 4;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  pre .c { color: var(--code-comment); }
+
+  /* Header */
+  .masthead { display: flex; flex-direction: column; gap: 28px; }
+  .masthead .lede { font-size: 1.2rem; line-height: 1.5; color: var(--ink-2); max-width: 62ch; }
+  .meta {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 6px 28px;
+    font: 13px/1.5 var(--f-mono);
+    padding: 16px 0;
+    border-top: 1px solid var(--rule-strong);
+    border-bottom: 1px solid var(--rule);
+    max-width: 860px;
+  }
+  .meta dt { color: var(--muted); }
+  .meta dd { color: var(--ink); }
+
+  section { display: flex; flex-direction: column; gap: 24px; }
+  .section-head { display: flex; flex-direction: column; gap: 8px; padding-top: 20px; border-top: 1px solid var(--rule-strong); }
+  .subhead { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+
+  /* Findings */
+  .findings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .finding {
+    background: var(--surface);
+    padding: 22px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .finding p { font-size: 16px; color: var(--ink-2); }
+  .headline {
+    font: 650 1.45rem/1.15 var(--f-display);
+    font-stretch: 88%;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .headline small { font: 400 13px/1.3 var(--f-mono); color: var(--muted); display: block; margin-top: 4px; }
+  .verdict {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font: 600 11.5px/1 var(--f-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 9px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+  .verdict i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .v-h3 { background: var(--h3-tint); }
+  .v-h2 { background: var(--h2-tint); }
+  .v-mixed { background: var(--code-bg); }
+  .dot-h2 { background: var(--h2); }
+  .dot-h3 { background: var(--h3); }
+
+  /* Topology */
+  .laptop {
+    border: 1px solid var(--rule-strong);
+    background: var(--code-bg);
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .laptop-label { font: 12.5px/1.45 var(--f-mono); color: var(--ink-2); }
+  .laptop-label b { font-weight: 600; color: var(--ink); }
+  .path { display: flex; align-items: stretch; gap: 10px; }
+  .hop {
+    flex: 1 1 0;
+    min-width: 0;
+    background: var(--surface);
+    border: 1px solid var(--rule-strong);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .hop h3 { font-size: 1rem; }
+  .hop p { font: 12.5px/1.55 var(--f-mono); color: var(--muted); }
+  .hop.shaped { border-color: var(--h3); }
+  .hop .tag {
+    align-self: flex-start;
+    font: 600 10.5px/1 var(--f-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 4px 6px;
+    border-radius: 2px;
+    background: var(--code-bg);
+    color: var(--ink-2);
+  }
+  .hop.shaped .tag { background: var(--h3-tint); color: var(--ink); }
+  .arrow { align-self: center; color: var(--muted); font: 18px/1 var(--f-mono); }
+
+  /* Config blocks */
+  .config-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .config { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .config .fig-sub { max-width: 60ch; }
+
+  /* Figures */
+  .fig {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: 22px clamp(14px, 2.6vw, 28px) 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .fig-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px 24px; flex-wrap: wrap; }
+  .fig-head > div { display: flex; flex-direction: column; gap: 4px; }
+  .fig-title { font-size: 1.05rem; font-weight: 650; font-stretch: 90%; }
+  .fig-sub { font: 12.5px/1.45 var(--f-mono); color: var(--muted); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 12.5px/1.2 var(--f-mono); color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .legend i.line { width: 18px; height: 3px; border-radius: 2px; }
+  .legend i.range { width: 18px; height: 2px; border-radius: 1px; background: var(--rule-strong); }
+  .chart { overflow-x: auto; }
+  .chart svg { display: block; width: 100%; min-width: 640px; height: auto; }
+  .fig .note { font-size: 14.5px; line-height: 1.55; color: var(--muted); max-width: 82ch; }
+
+  /* SVG */
+  .t-axis { fill: var(--muted); font-family: var(--f-mono); font-size: 12px; }
+  .t-label { fill: var(--ink-2); font-family: var(--f-mono); font-size: 12.5px; }
+  .t-strong { fill: var(--ink); font-weight: 600; }
+  .t-panel { fill: var(--ink); font-family: var(--f-display); font-size: 14px; font-weight: 650; }
+  .t-region { fill: var(--muted); font-family: var(--f-mono); font-size: 11.5px; letter-spacing: 0.04em; }
+  .g-line { stroke: var(--rule); stroke-width: 1; fill: none; }
+  .g-base { stroke: var(--rule-strong); stroke-width: 1.5; fill: none; }
+  .g-timeout { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 4; fill: none; }
+  .r-h2 { stroke: var(--h2); stroke-width: 2; stroke-linecap: round; opacity: 0.45; fill: none; }
+  .r-h3 { stroke: var(--h3); stroke-width: 2; stroke-linecap: round; opacity: 0.45; fill: none; }
+  .m-h2 { fill: var(--h2); }
+  .m-h3 { fill: var(--h3); }
+  .m-open-h3 { fill: var(--surface); stroke: var(--h3); stroke-width: 2; }
+  .m-open-d { fill: var(--surface); stroke-width: 2; }
+  .ring { stroke: var(--surface); stroke-width: 2; }
+  .hit { fill: transparent; }
+  .l-h2 { stroke: var(--h2); stroke-width: 2; fill: none; }
+  .l-h3 { stroke: var(--h3); stroke-width: 2; fill: none; }
+  .l-d0 { stroke: var(--d0); stroke-width: 2; fill: none; }
+  .l-d1 { stroke: var(--d1); stroke-width: 2; fill: none; }
+  .l-d2 { stroke: var(--d2); stroke-width: 2; fill: none; }
+  .f-d0 { fill: var(--d0); }
+  .f-d1 { fill: var(--d1); }
+  .f-d2 { fill: var(--d2); }
+  .s-d0 { stroke: var(--d0); }
+  .s-d1 { stroke: var(--d1); }
+  .s-d2 { stroke: var(--d2); }
+  .band { fill: var(--h3-tint); opacity: 0.55; }
+
+  .tip {
+    position: fixed;
+    z-index: 10;
+    pointer-events: none;
+    background: var(--tip-bg);
+    color: var(--tip-ink);
+    font: 12.5px/1.45 var(--f-mono);
+    padding: 7px 10px;
+    border-radius: 4px;
+    transform: translate(-50%, calc(-100% - 14px));
+    white-space: nowrap;
+  }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font: 13.5px/1.4 var(--f-mono); font-variant-numeric: tabular-nums; }
+  th {
+    font-weight: 500;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    text-align: right;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--rule-strong);
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+  td { text-align: right; padding: 8px 14px; border-bottom: 1px solid var(--rule); white-space: nowrap; color: var(--ink); }
+  tr:last-child td { border-bottom: 0; }
+  th:first-child, td:first-child { text-align: left; }
+  td.dim, span.dim { color: var(--muted); }
+  td.to { color: var(--h3); font-weight: 600; }
+  td.wrap { white-space: normal; text-align: left; min-width: 22ch; }
+  table.kv td { text-align: left; }
+  table.kv td:first-child { color: var(--muted); width: 1%; }
+  th .sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+
+  .factors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  .factor { background: var(--surface); padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+  .factor p { font-size: 15.5px; color: var(--ink-2); }
+  .factor .evidence { font: 12.5px/1.5 var(--f-mono); color: var(--muted); border-top: 1px solid var(--rule); padding-top: 10px; }
+
+  .controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font: 13px var(--f-mono); color: var(--muted); }
+  select {
+    font: 13.5px var(--f-mono);
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--rule-strong);
+    border-radius: 4px;
+    padding: 7px 10px;
+  }
+  select:focus-visible, a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+  .footer { font: 12.5px/1.6 var(--f-mono); color: var(--muted); border-top: 1px solid var(--rule); padding-top: 18px; }
+
+  @media (max-width: 820px) {
+    .findings, .factors, .config-grid { grid-template-columns: minmax(0, 1fr); }
+    .path { flex-direction: column; }
+    .arrow { transform: rotate(90deg); }
+    .meta { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .meta dd { margin-bottom: 8px; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <p class="eyebrow">Measurement report · Advanced Networking</p>
+    <h1>HTTP/2 vs HTTP/3 under emulated delay and packet loss</h1>
+    <p class="lede">Two experiments against nginx over TCP (HTTP/2) and QUIC (HTTP/3), with delay and loss injected on the server using <code>tc netem</code>: one isolates HTTP/3's protocol advantage, the other checks whether today's servers and clients let HTTP/3 replace HTTP/2.</p>
+    <dl class="meta">
+      <dt>Demo 2</dt><dd>Protocol advantage: 20 parallel streams on one connection under 0–12% loss, curl for both protocols</dd>
+      <dt>Demo 1</dt><dd>Deployment check: single requests through four clients, 0–50 ms delay, 0 or 2% loss</dd>
+      <dt>Measured</dt><dd>Demo 1: 15 Sep 2026, 21:48–22:20 · Demo 2: 15–16 Sep, 23:55–00:07 (UTC+7) · 5 runs each</dd>
+      <dt>Server</dt><dd>Ubuntu 26.04.1 VM 10.0.10.140 · nginx 1.31.5 · OpenSSL 3.5.8 · Docker Engine 29.8, host networking</dd>
+      <dt>Client</dt><dd>Kali Linux VM 10.0.10.130 · curl 8.18.0 · GNU Wget2 2.2.0 · aioquic 1.3.0</dd>
+      <dt>Network</dt><dd>VMware Workstation 17.5.2 virtual switch (VMnet8) · base RTT under 1 ms</dd>
+      <dt>Data</dt><dd>results-linux-server/ · results-demo1_*.csv, run-linux-server.log · results-demo2_*.csv, run-demo2-one-connection.log</dd>
+    </dl>
+  </header>
+
+  <section aria-labelledby="summary">
+    <div class="section-head">
+      <p class="eyebrow">Summary</p>
+      <h2 id="summary">What the measurements show</h2>
+    </div>
+    <div class="prose">
+      <p>The two demos answer different questions. <strong>Demo 2</strong> keeps the client, connection and workload identical and changes only the protocol, so it shows what HTTP/3 is designed to fix: head-of-line blocking between streams. <strong>Demo 1</strong> fetches single objects through several real clients, so its results depend as much on how nginx and each client implement HTTP/3 as on the protocol; it shows whether HTTP/3 can already take over from HTTP/2.</p>
+    </div>
+    <div class="findings">
+      <article class="finding">
+        <span class="verdict v-h3"><i class="dot-h3"></i>Demo 2 · protocol advantage</span>
+        <h3>HTTP/3 removes head-of-line blocking</h3>
+        <p class="headline">10.5× faster at 12% loss<small>20 × 1 MB on one verified connection · HTTP/3 6.05 s vs HTTP/2 63.7 s</small></p>
+        <p>HTTP/3 overtakes HTTP/2 from 4% loss (1.85×) and pulls far ahead at 8% (5.5×). From 0% to 12% loss the HTTP/2 batch slows 141×, HTTP/3 only 6×, because every lost TCP segment stalls all twenty streams.</p>
+      </article>
+      <article class="finding">
+        <span class="verdict v-h3"><i class="dot-h3"></i>Demo 1 · protocol advantage</span>
+        <h3>Faster connection setup on a delayed path</h3>
+        <p class="headline">62 ms vs 113 ms<small>10 KB at 25 ms delay · 115 vs 213 ms at 50 ms</small></p>
+        <p>The one place a single request already benefits: QUIC combines the transport and TLS 1.3 handshakes, so a small object arrives about 45% sooner once delay is added, with or without loss.</p>
+      </article>
+      <article class="finding">
+        <span class="verdict v-h2"><i class="dot-h2"></i>Demo 1 · deployment</span>
+        <h3>Single large downloads still favour HTTP/2</h3>
+        <p class="headline">18.8 s vs 33.8 s<small>10 MB at 25 ms delay and 2% loss · curl</small></p>
+        <p>With one stream there is no blocking to remove, and the kernel's TCP recovers from loss faster than user-space QUIC. At 50 ms and 2% loss four of five HTTP/3 requests passed 60 s. The same protocol varied by client: aioquic took 26.6 s where curl took 33.8 s.</p>
+      </article>
+      <article class="finding">
+        <span class="verdict v-mixed"><i class="dot-h3"></i><i class="dot-h2"></i>Demo 1 · deployment</span>
+        <h3>Not yet a drop-in replacement</h3>
+        <p class="headline">Only curl worked out of the box<small>Wget/wget2: no HTTP/3 · aioquic: library only · quiche-client: debug build · Proxygen: too heavy to build</small></p>
+        <p>nginx needed three HTTP/3 defaults changed to perform well, the HTTP/3 endpoint still has to serve TCP and advertise itself through Alt-Svc, and most download tools lacked usable HTTP/3 support. HTTP/3 complements HTTP/2 rather than replacing it.</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="setup">
+    <div class="section-head">
+      <p class="eyebrow">Method</p>
+      <h2 id="setup">Test bed and configuration</h2>
+    </div>
+
+    <div class="laptop" aria-label="Test bed topology">
+      <p class="laptop-label"><b>One laptop</b> · Windows 11 Pro · Intel Core i5-1135G7 (4 cores, 8 threads) · 15.7 GB RAM · VMware Workstation 17.5.2</p>
+      <div class="path">
+        <div class="hop">
+          <span class="tag">Client VM</span>
+          <h3>Kali Linux</h3>
+          <p>10.0.10.130<br>kernel 6.6.15 · 4 vCPU · 3.8 GiB<br>NIC e1000</p>
+        </div>
+        <span class="arrow" aria-hidden="true">↔</span>
+        <div class="hop">
+          <span class="tag">Link</span>
+          <h3>VMware virtual switch</h3>
+          <p>VMnet8 NAT · 10.0.10.0/24<br>VM-to-VM, not routed via Windows<br>base RTT under 1 ms</p>
+        </div>
+        <span class="arrow" aria-hidden="true">↔</span>
+        <div class="hop shaped">
+          <span class="tag">Server VM · netem</span>
+          <h3>Ubuntu 26.04.1</h3>
+          <p>10.0.10.140<br>kernel 7.0.0 · 2 vCPU · 3.3 GiB<br>NIC vmxnet3 (ens33)</p>
+        </div>
+        <span class="arrow" aria-hidden="true">↔</span>
+        <div class="hop">
+          <span class="tag">Containers</span>
+          <h3>nginx 1.31.5 ×2</h3>
+          <p>Docker 29.8, host network<br>HTTP/2 · TCP 8443<br>HTTP/3 · UDP 8444</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Client and server run as two virtual machines on the same laptop and exchange traffic over VMware's virtual switch. nginx runs in Docker containers with <em>host networking</em>, so it listens directly on the server VM's interface: there is no port forwarding or address translation, and nginx logs the client's real address. Docker Desktop was not used because its port forwarding terminates TCP connections but only relays UDP datagrams, which treats the two protocols differently.</p>
+    </div>
+
+    <div class="subhead">
+      <h3>Server</h3>
+    </div>
+    <div class="table-wrap">
+      <table class="kv">
+        <tbody>
+          <tr><td>Operating system</td><td>Ubuntu 26.04.1 LTS, kernel 7.0.0-31-generic, TCP congestion control cubic</td></tr>
+          <tr><td>Container runtime</td><td>Docker Engine 29.8.0, Compose v5.5.1, <code>network_mode: host</code></td></tr>
+          <tr><td>HTTP/2 server</td><td>nginx 1.31.5 (<code>nginx:alpine</code>), TLS 1.3, listens on TCP 8443</td></tr>
+          <tr><td>HTTP/3 server</td><td>nginx 1.31.5 (<code>nginx:mainline-alpine</code>, built with <code>http_v3_module</code>), OpenSSL 3.5.8, listens on UDP 8444</td></tr>
+          <tr><td>Certificate</td><td>Self-signed RSA 2048, generated at start-up; clients skip verification</td></tr>
+          <tr><td>Content</td><td>Random binary files, so compression doesn't apply: 10 KB, 100 KB, 1 MB, 10 MB, and 20 × 1 MB</td></tr>
+          <tr><td>Network interface</td><td>vmxnet3; TSO, GSO and GRO off during all runs, baseline included</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="config-grid">
+      <div class="config">
+        <h4>docker-compose.linux.yml</h4>
+        <pre><code>services:
+  http2-server:
+    build: { context: ., dockerfile: nginx/http2/Dockerfile }
+    network_mode: host
+  http3-server:
+    build: { context: ., dockerfile: nginx/http3/Dockerfile }
+    network_mode: host
+  netem:                      <span class="c"># runs tc on demand</span>
+    build: { context: ., dockerfile: scripts/netem.Dockerfile }
+    network_mode: host
+    cap_add: [NET_ADMIN]
+    profiles: [tools]</code></pre>
+        <p class="fig-sub">Volumes (nginx.conf, web root, certificates) and health checks omitted.</p>
+      </div>
+      <div class="config">
+        <h4>nginx: HTTP/2 server (nginx/http2/nginx.conf)</h4>
+        <pre><code>http {
+    sendfile on;  tcp_nopush on;  tcp_nodelay on;
+    server {
+        listen 8443 ssl;
+        http2 on;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_session_tickets off;
+        root /usr/share/nginx/html;
+    }
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="config-grid">
+      <div class="config">
+        <h4>nginx: HTTP/3 server (nginx/http3/nginx.conf)</h4>
+        <pre><code>http {
+    quic_retry off;
+    server {
+        listen 8444 ssl;              <span class="c"># TCP, HTTP/2 fallback</span>
+        listen 8444 quic reuseport;   <span class="c"># UDP, QUIC</span>
+        http2 on;
+        http3 on;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_session_tickets off;
+        quic_gso off;
+        http3_stream_buffer_size 16m;
+        add_header Alt-Svc 'h3=":8444"; ma=86400' always;
+    }
+}</code></pre>
+      </div>
+      <div class="config">
+        <h4>HTTP/3 settings changed from nginx defaults</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Directive</th><th>Value</th><th>Reason</th></tr></thead>
+            <tbody>
+              <tr><td>http3_stream_buffer_size</td><td>16m</td><td class="wrap dim">default 64k limits response data in flight to ~64 KB per round trip, throttling large downloads as delay grows</td></tr>
+              <tr><td>quic_retry</td><td>off</td><td class="wrap dim">Retry adds an address-validation round trip to every handshake; TCP has no equivalent</td></tr>
+              <tr><td>quic_gso</td><td>off</td><td class="wrap dim">GSO passes ~45 packets to the kernel as one, so netem would drop whole bursts instead of single packets</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="subhead">
+      <h3>Network emulation</h3>
+    </div>
+    <div class="config-grid">
+      <div class="prose">
+        <p>Delay and loss are applied to the server's <strong>outgoing</strong> traffic from ports 8443 and 8444 only, using a priority qdisc whose fourth band holds a netem qdisc. Server-to-client packets carry the payload, so a delay of <em>D</em> adds about <em>D</em> to every round trip; loss is random and independent per packet. SSH and other traffic stay in the normal bands.</p>
+        <p>The condition is applied with <code>scripts/set-network-condition-linux.sh</code>, run through the <code>netem</code> helper container over SSH from the client before each condition. The client then checks that time to first byte matches the delay and stops rather than record results under the wrong label.</p>
+      </div>
+      <div class="config">
+        <h4>Commands for 25 ms delay, 2% loss</h4>
+        <pre><code>ethtool -K ens33 tso off gso off gro off
+tc qdisc add dev ens33 root handle 1: prio bands 4 \
+   priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+tc qdisc add dev ens33 parent 1:4 handle 40: \
+   netem delay 25ms loss 2% limit 100000
+tc filter add dev ens33 parent 1: protocol ip prio 1 \
+   u32 match ip sport 8443 0xffff flowid 1:4
+tc filter add dev ens33 parent 1: protocol ip prio 1 \
+   u32 match ip sport 8444 0xffff flowid 1:4</code></pre>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Emulation check</th><th>Expected</th><th>Measured</th></tr></thead>
+        <tbody>
+          <tr><td>50 ms delay, time to first byte for 10 KB</td><td>rises by several × 50 ms</td><td>HTTP/2 7 → 160–166 ms · HTTP/3 8 → 108–115 ms</td></tr>
+          <tr><td>10% loss, 3 × 10 MB over HTTP/2</td><td>~10% retransmissions</td><td>10.5% of 22,055 TCP segments retransmitted</td></tr>
+          <tr><td>Traffic outside ports 8443/8444</td><td>unaffected</td><td>ping RTT stays under 1.2 ms while shaping</td></tr>
+          <tr><td>No proxy in the path</td><td>nginx sees the client</td><td>access log records 10.0.10.130 for both protocols</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subhead">
+      <h3>Client and procedure</h3>
+    </div>
+    <div class="table-wrap">
+      <table class="kv">
+        <tbody>
+          <tr><td>Operating system</td><td>Kali GNU/Linux Rolling, kernel 6.6.15-amd64</td></tr>
+          <tr><td>curl</td><td>8.18.0 · nghttp2 1.61.0 (HTTP/2) · ngtcp2 1.16.0 + nghttp3 1.12.0 (HTTP/3) · OpenSSL 3.6.3</td></tr>
+          <tr><td>wget2</td><td>GNU Wget2 2.2.0, HTTP/2 confirmed via ALPN before measuring</td></tr>
+          <tr><td>aioquic</td><td>1.3.0 on Python 3.14.6, small GET client with 16 MB flow-control windows</td></tr>
+          <tr><td>Demo 1 matrix</td><td>delay 0 / 25 / 50 ms × loss 0 / 2% · files 10 KB, 100 KB, 1 MB, 10 MB · 4 clients</td></tr>
+          <tr><td>Demo 2 matrix</td><td>delay 0 ms × loss 0 / 2 / 4 / 8 / 12% · 20 × 1 MB in parallel · curl only</td></tr>
+          <tr><td>Repetitions</td><td>5 per measurement, each on a new connection; median plus min and max</td></tr>
+          <tr><td>Timeouts</td><td>60 s per Demo 1 request, 120 s per Demo 2 transfer; slower runs count as failed</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="config-grid">
+      <div class="config">
+        <h4>Demo 1: one request per run</h4>
+        <pre><code><span class="c"># curl: time_total = connect + TLS + transfer</span>
+curl --http2      -k -s -o /dev/null --max-time 60 \
+     -w "%{time_total}" https://10.0.10.140:8443/resources/single/10mb.bin
+curl --http3-only -k -s -o /dev/null --max-time 60 \
+     -w "%{time_total}" https://10.0.10.140:8444/resources/single/10mb.bin
+
+<span class="c"># wget2: TLS handshake + transfer from its own stats</span>
+wget2 -q --no-check-certificate --no-tcp-fastopen --no-ocsp \
+      --no-hsts --no-hpkp -O /dev/null \
+      --stats-site=csv:site.csv --stats-tls=csv:tls.csv URL
+
+<span class="c"># aioquic: self-timed from connect to last byte</span>
+venv/bin/python aioquic-get.py --insecure URL</code></pre>
+      </div>
+      <div class="config">
+        <h4>Demo 2 and the full run</h4>
+        <pre><code><span class="c"># 20 transfers multiplexed over one connection</span>
+<span class="c"># (no --parallel-immediate: it opens a connection per file)</span>
+curl --http2 --parallel --parallel-max 20 -k -s \
+     -o /dev/null --max-time 120 \
+     -w "%{time_total} %{exitcode} %{num_connects}\n" \
+     "https://10.0.10.140:8443/resources/multi/file-[1-20].bin"
+<span class="c"># same with --http3-only against port 8444;</span>
+<span class="c"># sum of num_connects per batch must be 1</span>
+
+<span class="c"># client: applies every condition on the server over SSH</span>
+SERVER_SSH=myadmin@10.0.10.140 RUNS=5 \
+    ./run-benchmarks.sh 10.0.10.140</code></pre>
+        <p class="fig-sub">Process start-up is excluded for every client: curl and wget2 report internal timings, aioquic times itself. wget2's figure starts after the TCP connection is open, so it omits one round trip compared with curl.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="demo2">
+    <div class="section-head">
+      <p class="eyebrow">Demo 2 · Protocol advantage</p>
+      <h2 id="demo2">Twenty parallel streams on one connection</h2>
+    </div>
+    <div class="prose">
+      <p>This is the protocol comparison. Client (curl), server (nginx), connection count (one), workload (20 × 1 MB started together) and loss are identical for both protocols; only the transport underneath the streams changes. HTTP/2 multiplexes all streams over a single TCP byte stream, which must be delivered in order. HTTP/3 carries each stream separately inside QUIC, which recovers losses per stream.</p>
+      <p>curl reports for every transfer whether it opened a new connection, and each batch was checked to use exactly one connection for both protocols. This matters: an earlier run used curl's <code>--parallel-immediate</code>, which opens a separate connection per file, so it compared 20 independent connections and could not show head-of-line blocking. Those results were discarded.</p>
+    </div>
+
+    <figure class="fig">
+      <div class="fig-head">
+        <div>
+          <p class="fig-title">Figure 1. Batch completion time for 20 × 1 MB</p>
+          <p class="fig-sub">curl --parallel over one connection · mean of 5 batches · no delay · log scale · by packet loss</p>
+        </div>
+        <div class="legend"><span><i class="dot-h2"></i>HTTP/2</span><span><i class="dot-h3"></i>HTTP/3</span></div>
+      </div>
+      <div class="chart" id="fig4"></div>
+      <p class="note">The speed-up row is HTTP/2 batch time ÷ HTTP/3 batch time; above 1× HTTP/3 finishes first. Without loss HTTP/2 is ahead: kernel TCP moves bulk data cheaply, and nginx's HTTP/3 sends the streams of one connection largely one after another (see Demo 1). As loss rises, every lost TCP segment holds up all twenty HTTP/2 streams until it is retransmitted, while a lost QUIC packet delays only its own stream. From 4% loss that difference dominates, and at 12% it is worth an order of magnitude.</p>
+    </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Packet loss</th>
+            <th><span class="sw" style="background:var(--h2)"></span>HTTP/2 batch</th>
+            <th><span class="sw" style="background:var(--h3)"></span>HTTP/3 batch</th>
+            <th><span class="sw" style="background:var(--h2)"></span>HTTP/2 per stream</th>
+            <th><span class="sw" style="background:var(--h3)"></span>HTTP/3 per stream</th>
+            <th>Speed-up</th>
+            <th>Connections</th>
+            <th>Failed</th>
+          </tr>
+        </thead>
+        <tbody id="demo2-table"></tbody>
+      </table>
+    </div>
+    <div class="prose">
+      <p>Under loss the per-stream average sits close to the batch time for both protocols (at 12%: 61.3 s vs 63.7 s over HTTP/2), so the streams finish at about the same moment. For HTTP/2 that is head-of-line blocking at work: all streams wait on the same stalled byte stream and share one congestion window that every loss shrinks. HTTP/3 streams also end together, but ten times sooner.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="demo1">
+    <div class="section-head">
+      <p class="eyebrow">Demo 1 · Deployment check</p>
+      <h2 id="demo1">Single requests through real servers and clients</h2>
+    </div>
+    <div class="prose">
+      <p>A single request on a new connection uses one stream, so HTTP/3's stream independence has nothing to improve. What remains is the protocol's faster handshake, plus how well each implementation sends, receives and recovers data. Demo 1 therefore shows how today's software handles HTTP/3 in practice, and whether it can replace HTTP/2 for ordinary downloads.</p>
+    </div>
+
+    <div class="subhead">
+      <h3>HTTP/3 support met while building this test bed</h3>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Component</th><th>HTTP/3 in practice</th><th>What it took</th></tr></thead>
+        <tbody>
+          <tr><td>nginx 1.31.5</td><td class="wrap">Supported (<code>http_v3_module</code>, mainline image)</td><td class="wrap dim">Three defaults changed (stream buffer, Retry, GSO) before HTTP/3 performed reasonably</td></tr>
+          <tr><td>nginx stream scheduling</td><td class="wrap">HTTP/3 streams on one connection are sent largely in sequence</td><td class="wrap dim">20 × 1 MB without loss: the first 10 HTTP/3 streams arrived one after another (max 7 overlapping), HTTP/2 served 14 at once; aioquic showed the same, so it is server-side</td></tr>
+          <tr><td>HTTP/3 discovery</td><td class="wrap">Port 8444 also serves TCP and sends <code>Alt-Svc: h3</code></td><td class="wrap dim">Clients normally learn about HTTP/3 over an existing HTTP/2 or HTTP/1.1 connection, so the TCP service stays; the benchmark forces HTTP/3 with <code>--http3-only</code></td></tr>
+          <tr><td>curl 8.18.0</td><td class="wrap">Supported (ngtcp2 + nghttp3 build in Kali)</td><td class="wrap dim">Works out of the box; slower than aioquic on large lossy downloads</td></tr>
+          <tr><td>GNU Wget 1.25 / Wget2 2.2.0</td><td class="wrap">Not supported: Wget 1.x speaks HTTP/1.1, Wget2 HTTP/2</td><td class="wrap dim">Used Wget2 as a second HTTP/2 client only</td></tr>
+          <tr><td>aioquic 1.3.0</td><td class="wrap">Library only, no ready client installed</td><td class="wrap dim">Wrote a short client (aioquic-get.py) and raised its flow-control windows</td></tr>
+          <tr><td>quiche-client</td><td class="wrap">Available only as a debug build compiled from source</td><td class="wrap dim">Several times slower than curl and timed with process start-up; excluded from the final run</td></tr>
+          <tr><td>Proxygen (hq)</td><td class="wrap">Requires building folly, fizz, wangle and mvfst</td><td class="wrap dim">Build exhausted the 4 vCPU / 3.8 GiB client VM and was abandoned</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="fig">
+      <div class="fig-head">
+        <div>
+          <p class="fig-title">Figure 2. Small object: 10 KB</p>
+          <p class="fig-sub">curl · median of 5 new connections, line = min to max · by server delay · loss</p>
+        </div>
+        <div class="legend"><span><i class="dot-h2"></i>HTTP/2</span><span><i class="dot-h3"></i>HTTP/3</span><span><i class="range"></i>min–max</span></div>
+      </div>
+      <div class="chart" id="fig1"></div>
+      <p class="note">Without delay both protocols deliver 10 KB in under 13 ms. With delay HTTP/3 is ahead by about 45% in every condition, and loss barely changes that. The medians correspond to roughly four delayed server round trips for HTTP/2 against about two for HTTP/3: 25 ms × 4 ≈ 100 ms vs 25 ms × 2 ≈ 50 ms, plus a few milliseconds of base latency.</p>
+    </figure>
+
+    <figure class="fig">
+      <div class="fig-head">
+        <div>
+          <p class="fig-title">Figure 3. HTTP/3 time relative to HTTP/2, by file size</p>
+          <p class="fig-sub">curl · HTTP/3 median ÷ HTTP/2 median · log scale · below 1× HTTP/3 is faster</p>
+        </div>
+        <div class="legend">
+          <span><i class="line" style="background:var(--d0)"></i>0 ms delay</span>
+          <span><i class="line" style="background:var(--d1)"></i>25 ms</span>
+          <span><i class="line" style="background:var(--d2)"></i>50 ms</span>
+        </div>
+      </div>
+      <div class="chart" id="fig2"></div>
+      <p class="note">Without loss and with delay, HTTP/3 is at or below parity from 10 KB to 1 MB. With 2% loss and delay it stays ahead only for 10 KB, where the handshake dominates; from 100 KB on it takes 1.4–3.5× as long. At 50 ms · 2% the 10 MB point is a lower bound, because four of five HTTP/3 runs timed out.</p>
+    </figure>
+
+    <figure class="fig">
+      <div class="fig-head">
+        <div>
+          <p class="fig-title">Figure 4. Large object: 10 MB</p>
+          <p class="fig-sub">curl · median of 5 runs, line = min to max · log scale · 60 s per-request timeout</p>
+        </div>
+        <div class="legend"><span><i class="dot-h2"></i>HTTP/2</span><span><i class="dot-h3"></i>HTTP/3</span><span><i style="background:var(--surface);box-shadow:inset 0 0 0 2px var(--h3)"></i>mostly timed out</span></div>
+      </div>
+      <div class="chart" id="fig3"></div>
+      <p class="note">Loss dominates the transfer time for both protocols: at 25 ms, 2% loss turns a sub-second download into 19 s over HTTP/2 and 34 s over HTTP/3. Note the wide HTTP/3 range at 50 ms without loss (0.73–5.1 s), where the fastest HTTP/3 run beat the fastest HTTP/2 run.</p>
+    </figure>
+
+    <div class="prose">
+      <h3>Same protocol, different clients</h3>
+      <p>The two HTTP/2 clients agree closely on large files (wget2 is faster on small files only because its timing starts after the TCP connection is open). The two HTTP/3 clients do not: aioquic, written in Python, is slower than curl without loss, yet with loss and delay it downloads 10 MB faster than curl. For HTTP/3 the choice of implementation still changes results as much as the network does, which is itself a sign of a younger ecosystem.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>10 MB, median</th>
+            <th><span class="sw" style="background:var(--h2)"></span>curl HTTP/2</th>
+            <th><span class="sw" style="background:var(--h2)"></span>wget2 HTTP/2</th>
+            <th><span class="sw" style="background:var(--h3)"></span>curl HTTP/3</th>
+            <th><span class="sw" style="background:var(--h3)"></span>aioquic HTTP/3</th>
+          </tr>
+        </thead>
+        <tbody id="clients-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="why">
+    <div class="section-head">
+      <p class="eyebrow">Discussion</p>
+      <h2 id="why">Protocol advantages and deployment reality</h2>
+    </div>
+    <div class="factors">
+      <article class="factor">
+        <p class="eyebrow">Protocol · Demo 2</p>
+        <h3>No head-of-line blocking between streams</h3>
+        <p>HTTP/2 multiplexes streams over one TCP connection, which delivers bytes strictly in order, so a lost segment stalls all streams. QUIC recovers loss per stream and the other streams keep going. The benefit grows with the loss rate and the number of parallel streams.</p>
+        <p class="evidence">20 × 1 MB on one connection, 0% → 12% loss: HTTP/2 0.45 → 63.7 s, HTTP/3 0.96 → 6.05 s</p>
+      </article>
+      <article class="factor">
+        <p class="eyebrow">Protocol · Demo 1</p>
+        <h3>Fewer round trips to set up a connection</h3>
+        <p>HTTP/2 needs a TCP handshake, then a TLS 1.3 handshake, before the request. QUIC carries TLS inside its own handshake, so the request goes out one exchange earlier. On a delayed path the saved round trips dominate small requests.</p>
+        <p class="evidence">10 KB at 50 ms: HTTP/2 213 ms vs HTTP/3 115 ms</p>
+      </article>
+      <article class="factor">
+        <p class="eyebrow">Deployment · Demo 1</p>
+        <h3>Mature kernel TCP against young user-space QUIC</h3>
+        <p>For a single lossy stream, transfer time depends on how fast lost packets are detected and repaired. The Linux kernel's TCP has decades of tuning for exactly this; nginx's QUIC and curl's ngtcp2 run in user space and are far newer, and they fell behind by 1.8× or more.</p>
+        <p class="evidence">10 MB at 25 ms · 2%: HTTP/2 18.8 s vs HTTP/3 33.8 s</p>
+      </article>
+      <article class="factor">
+        <p class="eyebrow">Deployment · Demo 1</p>
+        <h3>Uneven support across software</h3>
+        <p>Among the tools tried, only curl offered ready-made HTTP/3; results for the same protocol differed widely between curl and aioquic; nginx needed tuning; and the HTTP/3 service still relies on a TCP endpoint for discovery and fallback.</p>
+        <p class="evidence">10 MB at 50 ms · 2%: aioquic 52.6 s vs curl 4 of 5 runs over 60 s</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="limits">
+    <div class="section-head">
+      <p class="eyebrow">Threats to validity</p>
+      <h2 id="limits">Limitations</h2>
+    </div>
+    <div class="prose">
+      <ul>
+        <li><strong>Shared hardware.</strong> Both VMs run on one laptop and use 6 of its 8 hardware threads, so CPU contention can affect transfers that are CPU-bound, such as QUIC processing and the Python client.</li>
+        <li><strong>One server implementation.</strong> Demo 2 uses curl and nginx only, and Demo 1's deployment findings cover the tools tried here; other servers (for example with a different QUIC stack) or clients may behave differently, as the aioquic results already show.</li>
+        <li><strong>Emulated path.</strong> Delay and loss apply only to server-to-client packets, loss is uniform and independent with no bursts, and no bandwidth limit is set. Without shaping, HTTP/2 moves 10 MB in 0.21 s, about 400 Mbit/s.</li>
+        <li><strong>Five runs.</strong> Medians with min and max limit the effect of outliers, but some ranges are wide, for example HTTP/3 10 MB at 50 ms without loss (0.73–5.1 s).</li>
+        <li><strong>Timeouts.</strong> The true 10 MB HTTP/3 time at 50 ms · 2% is unknown beyond "over 60 s" for four of five runs.</li>
+        <li><strong>Not covered.</strong> Connection resumption and 0-RTT (session tickets are off), connection migration, and loss on the client-to-server direction.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="conclusion">
+    <div class="section-head">
+      <p class="eyebrow">Conclusion</p>
+      <h2 id="conclusion">Conclusion</h2>
+    </div>
+    <div class="prose">
+      <p><strong>The protocol advantage is real.</strong> With client, server and workload held constant (Demo 2), HTTP/3's independent streams made a 20-stream batch on one connection 1.9× to 10.5× faster at 4% to 12% packet loss, while HTTP/2's batch time grew about 140-fold. Its combined transport and TLS handshake also made small requests about 45% faster on a delayed path.</p>
+      <p><strong>HTTP/3 does not yet replace HTTP/2.</strong> Through real software (Demo 1), a single large download with loss took HTTP/3 roughly twice as long or more, because mature kernel TCP out-recovers today's user-space QUIC stacks. HTTP/3 support was uneven: one of the download tools tried worked out of the box, a Python client beat curl in some conditions, nginx needed tuning, and the HTTP/3 service still depended on TCP for discovery and fallback.</p>
+      <p>HTTP/3 is therefore best deployed alongside HTTP/2: it pays off for pages that load many objects over lossy or high-latency networks, while HTTP/2 remains the dependable path for everything else and for clients and networks that cannot use QUIC.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="appendix">
+    <div class="section-head">
+      <p class="eyebrow">Appendix</p>
+      <h2 id="appendix">Full Demo 1 results</h2>
+    </div>
+    <div class="controls">
+      <label for="cond">Condition</label>
+      <select id="cond"></select>
+      <span>median of 5 runs · min–max below · failed = runs over 60 s</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>File</th>
+            <th><span class="sw" style="background:var(--h2)"></span>curl HTTP/2</th>
+            <th><span class="sw" style="background:var(--h3)"></span>curl HTTP/3</th>
+            <th>HTTP/3 ÷ HTTP/2</th>
+            <th><span class="sw" style="background:var(--h2)"></span>wget2 HTTP/2</th>
+            <th><span class="sw" style="background:var(--h3)"></span>aioquic HTTP/3</th>
+          </tr>
+        </thead>
+        <tbody id="full-table"></tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <h3>Reproducing the run</h3>
+    </div>
+    <pre><code><span class="c"># server VM (Ubuntu), in ~/h2-vs-h3</span>
+docker compose -f docker-compose.linux.yml up -d --build
+docker compose -f docker-compose.linux.yml build netem
+
+<span class="c"># client VM (Kali), in client/ — needs SSH key login to the server</span>
+./run-benchmarks.sh check 10.0.10.140
+SERVER_SSH=myadmin@10.0.10.140 RUNS=5 ./run-benchmarks.sh 10.0.10.140
+
+<span class="c"># one condition by hand</span>
+docker compose -f docker-compose.linux.yml run --rm netem 25ms 2%     <span class="c"># server</span>
+./run-benchmarks.sh demo1 10.0.10.140 25ms 2%                         <span class="c"># client</span>
+docker compose -f docker-compose.linux.yml run --rm netem reset       <span class="c"># server</span></code></pre>
+  </section>
+
+  <p class="footer">Times are seconds from the start of the connection to the last byte unless noted. Loss percentages are netem's per-packet drop probability on the server's outgoing benchmark traffic.</p>
+</div>
+
+<div class="tip" id="tip" hidden></div>
+
+<script>
+(function () {
+  const FILES = ["10kb", "100kb", "1mb", "10mb"];
+  const FILE_LABEL = { "10kb": "10 KB", "100kb": "100 KB", "1mb": "1 MB", "10mb": "10 MB" };
+
+  // per file: [curl HTTP/2, curl HTTP/3, wget2 HTTP/2, aioquic HTTP/3], each [median, min, max, failed runs]
+  const DEMO1 = [
+    { delay: 0, loss: 0, v: {
+      "10kb":  [[0.0086, 0.0064, 0.0088, 0], [0.0089, 0.0084, 0.0110, 0], [0.0050, 0.0040, 0.0060, 0], [0.0267, 0.0168, 0.1321, 0]],
+      "100kb": [[0.0100, 0.0091, 0.0121, 0], [0.0137, 0.0119, 0.0150, 0], [0.0070, 0.0050, 0.0110, 0], [0.0313, 0.0250, 0.0495, 0]],
+      "1mb":   [[0.0248, 0.0234, 0.0276, 0], [0.0659, 0.0423, 0.0941, 0], [0.0290, 0.0240, 0.0350, 0], [0.1019, 0.0959, 0.1234, 0]],
+      "10mb":  [[0.2120, 0.1896, 0.2199, 0], [0.4749, 0.4648, 0.5178, 0], [0.2010, 0.1850, 0.2280, 0], [0.8275, 0.7778, 0.9637, 0]] } },
+    { delay: 0, loss: 2, v: {
+      "10kb":  [[0.0081, 0.0062, 0.0101, 0], [0.0125, 0.0073, 0.0254, 0], [0.0050, 0.0050, 0.0060, 0], [0.0236, 0.0161, 0.0308, 0]],
+      "100kb": [[0.0102, 0.0079, 0.0122, 0], [0.0115, 0.0097, 0.0234, 0], [0.0110, 0.0080, 0.0110, 0], [0.0415, 0.0297, 0.0584, 0]],
+      "1mb":   [[0.0347, 0.0225, 0.0784, 0], [0.1180, 0.0975, 0.1675, 0], [0.0280, 0.0220, 0.0390, 0], [0.2684, 0.1668, 0.4335, 0]],
+      "10mb":  [[0.6488, 0.3231, 1.3459, 0], [1.1696, 1.0380, 1.2242, 0], [0.7100, 0.1900, 1.1300, 0], [3.4827, 3.1541, 3.7071, 0]] } },
+    { delay: 25, loss: 0, v: {
+      "10kb":  [[0.1132, 0.1111, 0.1161, 0], [0.0622, 0.0592, 0.0633, 0], [0.0820, 0.0800, 0.0830, 0], [0.0756, 0.0725, 0.0837, 0]],
+      "100kb": [[0.1644, 0.1621, 0.1689, 0], [0.1431, 0.1406, 0.1445, 0], [0.1360, 0.1350, 0.1380, 0], [0.1638, 0.1537, 0.1660, 0]],
+      "1mb":   [[0.2584, 0.2468, 0.2714, 0], [0.2417, 0.2327, 0.2620, 0], [0.2230, 0.2140, 0.2260, 0], [0.3066, 0.2849, 0.3111, 0]],
+      "10mb":  [[0.8960, 0.4290, 1.0173, 0], [0.8426, 0.4918, 2.9938, 0], [0.7970, 0.4800, 1.0460, 0], [1.3862, 1.2737, 1.8116, 0]] } },
+    { delay: 25, loss: 2, v: {
+      "10kb":  [[0.1142, 0.1117, 0.4827, 0], [0.0615, 0.0598, 0.0905, 0], [0.0840, 0.0830, 0.3420, 0], [0.0778, 0.0708, 0.0856, 0]],
+      "100kb": [[0.1678, 0.1648, 0.3486, 0], [0.2380, 0.1692, 0.4330, 0], [0.1390, 0.1370, 0.6110, 0], [0.1874, 0.1623, 0.2441, 0]],
+      "1mb":   [[0.7946, 0.2856, 1.5483, 0], [2.7949, 0.2643, 3.5192, 0], [0.6880, 0.3910, 1.7330, 0], [1.0551, 0.4490, 2.5305, 0]],
+      "10mb":  [[18.7836, 10.2844, 21.6740, 0], [33.7877, 29.3714, 35.3046, 0], [15.4670, 8.1050, 22.1170, 0], [26.6068, 25.5555, 28.4708, 0]] } },
+    { delay: 50, loss: 0, v: {
+      "10kb":  [[0.2130, 0.2106, 0.2144, 0], [0.1152, 0.1102, 0.1156, 0], [0.1580, 0.1560, 0.1590, 0], [0.1275, 0.1229, 0.1333, 0]],
+      "100kb": [[0.3163, 0.3136, 0.3202, 0], [0.2695, 0.2678, 0.2848, 0], [0.2620, 0.2600, 0.2640, 0], [0.2920, 0.2869, 0.2944, 0]],
+      "1mb":   [[0.4904, 0.4817, 0.5396, 0], [0.4440, 0.4432, 0.5425, 0], [0.4180, 0.4170, 0.4340, 0], [0.5638, 0.5015, 0.6402, 0]],
+      "10mb":  [[1.2769, 0.9078, 1.5283, 0], [3.7043, 0.7258, 5.1223, 0], [1.3750, 0.6900, 1.6800, 0], [2.3216, 2.0994, 2.4759, 0]] } },
+    { delay: 50, loss: 2, v: {
+      "10kb":  [[0.2147, 0.2115, 0.2162, 0], [0.1152, 0.1108, 0.1659, 0], [0.1580, 0.1560, 0.1600, 0], [0.1288, 0.1241, 0.1363, 0]],
+      "100kb": [[0.3179, 0.3161, 0.3684, 0], [0.4550, 0.3199, 0.5775, 0], [0.2630, 0.2600, 0.7790, 0], [0.3524, 0.2938, 0.5087, 0]],
+      "1mb":   [[2.1143, 0.4739, 2.6507, 0], [6.1254, 5.3858, 6.6400, 0], [3.4390, 0.7420, 4.1290, 0], [4.6388, 3.0249, 6.0495, 0]],
+      "10mb":  [[33.1440, 30.4993, 43.7074, 0], [58.5599, 58.5599, 58.5599, 4], [36.2230, 32.9540, 38.4730, 0], [52.5612, 48.8212, 52.9440, 0]] } }
+  ];
+
+  const DEMO2 = [
+    { loss: 0,  h2: 0.4508,  h3: 0.9639, h2s: 0.2636,  h3s: 0.6269, up: 0.47 },
+    { loss: 2,  h2: 1.7857,  h3: 2.2793, h2s: 1.5358,  h3s: 2.2433, up: 0.78 },
+    { loss: 4,  h2: 5.3057,  h3: 2.8701, h2s: 4.9008,  h3s: 2.8272, up: 1.85 },
+    { loss: 8,  h2: 21.7486, h3: 3.9868, h2s: 20.5702, h3s: 3.9510, up: 5.46 },
+    { loss: 12, h2: 63.7198, h3: 6.0503, h2s: 61.2511, h3s: 6.0039, up: 10.53 }
+  ];
+
+  const RUNS = 5;
+  const NS = "http://www.w3.org/2000/svg";
+  const tip = document.getElementById("tip");
+
+  function svgEl(tag, attrs, parent) {
+    const node = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (k === "text") node.textContent = v;
+      else node.setAttribute(k, v);
+    }
+    if (parent) parent.appendChild(node);
+    return node;
+  }
+
+  function fmtT(s) {
+    if (s == null) return "—";
+    if (s < 1) return Math.round(s * 1000) + " ms";
+    if (s < 10) return s.toFixed(2) + " s";
+    return s.toFixed(1) + " s";
+  }
+  function condLabel(c) { return c.delay + " ms · " + c.loss + "%"; }
+  // a measurement is "mostly timed out" when most runs failed
+  function timedOut(m) { return m[3] > RUNS / 2; }
+  function relText(r) {
+    if (r < 0.95) return Math.round((1 - r) * 100) + "% faster";
+    if (r <= 1.05) return "about equal";
+    return r.toFixed(1) + "× slower";
+  }
+
+  function placeTip(e) {
+    tip.style.left = e.clientX + "px";
+    tip.style.top = e.clientY + "px";
+  }
+  function bindTip(node, lines) {
+    node.addEventListener("pointerenter", function (e) {
+      tip.replaceChildren();
+      lines.forEach(function (line, i) {
+        if (i) tip.appendChild(document.createElement("br"));
+        const span = document.createElement("span");
+        if (i === 0) span.style.fontWeight = "600";
+        span.textContent = line;
+        tip.appendChild(span);
+      });
+      tip.hidden = false;
+      placeTip(e);
+    });
+    node.addEventListener("pointermove", placeTip);
+    node.addEventListener("pointerleave", function () { tip.hidden = true; });
+    svgEl("title", { text: lines.join(" — ") }, node);
+  }
+  function measureLines(name, label, m) {
+    const lines = [name + " · " + label, "median " + fmtT(m[0]) + " · range " + fmtT(m[1]) + "–" + fmtT(m[2])];
+    if (m[3]) lines.push(m[3] + " of " + RUNS + " runs over 60 s");
+    return lines;
+  }
+
+  // Dumbbell-style ranges: one row per condition, HTTP/2 above HTTP/3
+  function rangeChart(mount, opts) {
+    const W = 780, labelW = 100, relW = 136, top = 36, rowH = 44, gap = 12;
+    const x0 = labelW + 18, x1 = W - relW - 18;
+    const ys = [];
+    let y = top;
+    opts.rows.forEach(function (r, i) {
+      if (i > 0 && r.group !== opts.rows[i - 1].group) y += gap;
+      ys.push(y + rowH / 2);
+      y += rowH;
+    });
+    const H = y + 6;
+    const [d0, d1] = opts.domain;
+    const X = opts.log
+      ? function (v) { return x0 + (Math.log(Math.max(v, d0)) - Math.log(d0)) / (Math.log(d1) - Math.log(d0)) * (x1 - x0); }
+      : function (v) { return x0 + (Math.min(v, d1) - d0) / (d1 - d0) * (x1 - x0); };
+
+    const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": opts.aria });
+    opts.ticks.forEach(function (t) {
+      const x = X(t);
+      svgEl("line", { x1: x, x2: x, y1: top - 4, y2: H - 4, class: t === opts.timeout ? "g-timeout" : "g-line" }, svg);
+      svgEl("text", { x: x, y: top - 12, "text-anchor": "middle", class: "t-axis", text: opts.tickFmt(t) }, svg);
+    });
+    svgEl("text", { x: x1 + 22, y: top - 12, class: "t-axis", text: "HTTP/3" }, svg);
+
+    opts.rows.forEach(function (r, i) {
+      const cy = ys[i];
+      svgEl("text", { x: labelW, y: cy + 4, "text-anchor": "end", class: "t-label", text: r.label }, svg);
+      [["h2", r.h2, -7, "HTTP/2"], ["h3", r.h3, 7, "HTTP/3"]].forEach(function (s) {
+        const key = s[0], m = s[1], yy = cy + s[2];
+        const out = timedOut(m);
+        const xm = out ? X(opts.timeout) : X(m[0]);
+        if (!out) svgEl("line", { x1: X(m[1]), x2: X(m[2]), y1: yy, y2: yy, class: "r-" + key }, svg);
+        svgEl("circle", { cx: xm, cy: yy, r: 5, class: out ? "m-open-h3" : "m-" + key + " ring" }, svg);
+        bindTip(svgEl("rect", { x: Math.min(xm, out ? xm : X(m[1])) - 8, y: yy - 7, width: Math.max(16, (out ? 0 : X(m[2]) - X(m[1])) + 16), height: 14, class: "hit" }, svg),
+          measureLines(s[3], r.label, m));
+      });
+      const rel = timedOut(r.h3) ? r.h3[3] + " of 5 > 60 s" : relText(r.h3[0] / r.h2[0]);
+      const strong = timedOut(r.h3) || r.h3[0] / r.h2[0] < 0.95;
+      svgEl("text", { x: x1 + 22, y: cy + 4, class: "t-label" + (strong ? " t-strong" : ""), text: rel }, svg);
+    });
+    mount.appendChild(svg);
+  }
+
+  function ratioPanels(mount) {
+    const W = 780, H = 360, t = 40, b = 44, gapX = 88, l = 56, r = 24;
+    const panelW = (W - l - r - gapX) / 2;
+    const dom = [0.4, 4.4];
+    const y0 = H - b, y1 = t;
+    const Y = function (v) { return y0 - (Math.log(v) - Math.log(dom[0])) / (Math.log(dom[1]) - Math.log(dom[0])) * (y0 - y1); };
+    const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "HTTP/3 median time divided by HTTP/2 median time by file size, no loss and 2% loss panels" });
+
+    [0, 2].forEach(function (loss, p) {
+      const px0 = l + p * (panelW + gapX), px1 = px0 + panelW;
+      const X = function (i) { return px0 + 14 + i * (panelW - 28) / (FILES.length - 1); };
+      svgEl("text", { x: px0, y: t - 18, class: "t-panel", text: loss === 0 ? "No loss" : "2% loss" }, svg);
+      svgEl("rect", { x: px0, y: Y(1), width: panelW, height: y0 - Y(1), class: "band" }, svg);
+      [0.5, 1, 2, 4].forEach(function (v) {
+        svgEl("line", { x1: px0, x2: px1, y1: Y(v), y2: Y(v), class: v === 1 ? "g-base" : "g-line" }, svg);
+        svgEl("text", { x: px0 - 8, y: Y(v) + 4, "text-anchor": "end", class: "t-axis", text: v + "×" }, svg);
+      });
+      FILES.forEach(function (f, i) {
+        svgEl("text", { x: X(i), y: y0 + 22, "text-anchor": "middle", class: "t-axis", text: FILE_LABEL[f] }, svg);
+      });
+      svgEl("text", { x: px1 - 6, y: y0 - 8, "text-anchor": "end", class: "t-region", text: "↓ HTTP/3 faster" }, svg);
+
+      [0, 25, 50].forEach(function (delay, si) {
+        const cond = DEMO1.find(function (c) { return c.delay === delay && c.loss === loss; });
+        const pts = FILES.map(function (f, i) {
+          const h2 = cond.v[f][0], h3 = cond.v[f][1];
+          const out = timedOut(h3);
+          const ratio = (out ? 60 : h3[0]) / h2[0];
+          return { i: i, f: f, h2: h2, h3: h3, out: out, ratio: ratio };
+        });
+        svgEl("path", { d: pts.map(function (q, k) { return (k ? "L" : "M") + X(q.i) + " " + Y(q.ratio); }).join(" "), class: "l-d" + si }, svg);
+        pts.forEach(function (q) {
+          svgEl("circle", { cx: X(q.i), cy: Y(q.ratio), r: 4.5, class: q.out ? "m-open-d s-d" + si : "f-d" + si + " ring" }, svg);
+          const lines = [delay + " ms · " + (loss ? "2% loss" : "no loss") + " · " + FILE_LABEL[q.f],
+            (q.out ? "≥ " : "") + q.ratio.toFixed(2) + "× · HTTP/3 " + (q.out ? "4 of 5 runs > 60 s" : fmtT(q.h3[0])) + " vs HTTP/2 " + fmtT(q.h2[0])];
+          bindTip(svgEl("circle", { cx: X(q.i), cy: Y(q.ratio), r: 12, class: "hit" }, svg), lines);
+        });
+        // Direct labels on the no-loss panel, where the three end values are well apart
+        if (p === 0) {
+          const last = pts[pts.length - 1];
+          svgEl("text", { x: X(last.i) + 10, y: Y(last.ratio) + 4, class: "t-label", text: delay + " ms" }, svg);
+        }
+      });
+    });
+    mount.appendChild(svg);
+  }
+
+  function demo2Chart(mount) {
+    const W = 780, H = 340, l = 92, r = 96, t = 22, b = 76;
+    const x0 = l, x1 = W - r, y0 = H - b, y1 = t;
+    const X = function (loss) { return x0 + loss / 12 * (x1 - x0); };
+    const dom = [0.3, 100];
+    const Y = function (v) { return y0 - (Math.log(v) - Math.log(dom[0])) / (Math.log(dom[1]) - Math.log(dom[0])) * (y0 - y1); };
+    const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "Batch completion time for 20 parallel 1 MB downloads on one connection by packet loss, log scale" });
+
+    [0.3, 1, 3, 10, 30, 100].forEach(function (v) {
+      svgEl("line", { x1: x0, x2: x1, y1: Y(v), y2: Y(v), class: v === 0.3 ? "g-base" : "g-line" }, svg);
+      svgEl("text", { x: x0 - 12, y: Y(v) + 4, "text-anchor": "end", class: "t-axis", text: v < 1 ? Math.round(v * 1000) + " ms" : v + " s" }, svg);
+    });
+    DEMO2.forEach(function (d) {
+      svgEl("text", { x: X(d.loss), y: y0 + 22, "text-anchor": "middle", class: "t-axis", text: d.loss + "%" }, svg);
+      svgEl("text", { x: X(d.loss), y: y0 + 54, "text-anchor": "middle", class: "t-label" + (d.up > 1 ? " t-strong" : ""), text: d.up.toFixed(2) + "×" }, svg);
+    });
+    svgEl("text", { x: x0 - 30, y: y0 + 54, "text-anchor": "end", class: "t-axis", text: "speed-up" }, svg);
+
+    [["h2", "HTTP/2"], ["h3", "HTTP/3"]].forEach(function (s) {
+      const key = s[0], name = s[1];
+      svgEl("path", { d: DEMO2.map(function (d, k) { return (k ? "L" : "M") + X(d.loss) + " " + Y(d[key]); }).join(" "), class: "l-" + key }, svg);
+      DEMO2.forEach(function (d) {
+        svgEl("circle", { cx: X(d.loss), cy: Y(d[key]), r: 5, class: "m-" + key + " ring" }, svg);
+        bindTip(svgEl("circle", { cx: X(d.loss), cy: Y(d[key]), r: 13, class: "hit" }, svg),
+          [name + " · " + d.loss + "% loss", "batch " + fmtT(d[key]) + " · per stream " + fmtT(d[key + "s"])]);
+      });
+      const last = DEMO2[DEMO2.length - 1];
+      svgEl("text", { x: X(last.loss) + 14, y: Y(last[key]) + 4, class: "t-label", text: name }, svg);
+    });
+    mount.appendChild(svg);
+  }
+
+  function rows(file) {
+    return DEMO1.map(function (c) { return { label: condLabel(c), group: c.delay, h2: c.v[file][0], h3: c.v[file][1] }; });
+  }
+
+  rangeChart(document.getElementById("fig1"), {
+    aria: "10 KB download time for HTTP/2 and HTTP/3 in each condition with min to max ranges",
+    rows: rows("10kb"),
+    domain: [0, 0.5],
+    ticks: [0, 0.1, 0.2, 0.3, 0.4, 0.5],
+    tickFmt: function (v) { return v === 0 ? "0" : Math.round(v * 1000) + " ms"; }
+  });
+
+  ratioPanels(document.getElementById("fig2"));
+
+  rangeChart(document.getElementById("fig3"), {
+    aria: "10 MB download time for HTTP/2 and HTTP/3 in each condition, log scale, with min to max ranges",
+    rows: rows("10mb"),
+    log: true,
+    domain: [0.1, 80],
+    ticks: [0.1, 0.3, 1, 3, 10, 30, 60],
+    timeout: 60,
+    tickFmt: function (v) { return v < 1 ? Math.round(v * 1000) + " ms" : v + " s"; }
+  });
+
+  demo2Chart(document.getElementById("fig4"));
+
+  function cellText(m) {
+    if (timedOut(m)) return m[3] + " of 5 > 60 s";
+    return fmtT(m[0]) + (m[3] ? " · " + m[3] + " failed" : "");
+  }
+
+  const clientsBody = document.getElementById("clients-table");
+  DEMO1.forEach(function (c) {
+    const v = c.v["10mb"];
+    const tr = document.createElement("tr");
+    [condLabel(c), cellText(v[0]), cellText(v[2]), cellText(v[1]), cellText(v[3])].forEach(function (text, i) {
+      const td = document.createElement("td");
+      td.textContent = text;
+      if (i === 3 && timedOut(v[1])) td.className = "to";
+      tr.appendChild(td);
+    });
+    clientsBody.appendChild(tr);
+  });
+
+  const d2body = document.getElementById("demo2-table");
+  DEMO2.forEach(function (d) {
+    const tr = document.createElement("tr");
+    [d.loss + "%", fmtT(d.h2), fmtT(d.h3), fmtT(d.h2s), fmtT(d.h3s), d.up.toFixed(2) + "×", "1", "0"].forEach(function (text, i) {
+      const td = document.createElement("td");
+      td.textContent = text;
+      if (i >= 6) td.className = "dim";
+      tr.appendChild(td);
+    });
+    d2body.appendChild(tr);
+  });
+
+  const select = document.getElementById("cond");
+  const fullBody = document.getElementById("full-table");
+  DEMO1.forEach(function (c, i) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = c.delay + " ms delay · " + c.loss + "% loss";
+    select.appendChild(opt);
+  });
+
+  function measureCell(m) {
+    const td = document.createElement("td");
+    if (timedOut(m)) {
+      td.className = "to";
+      td.textContent = m[3] + " of 5 > 60 s";
+      return td;
+    }
+    td.appendChild(document.createTextNode(fmtT(m[0])));
+    td.appendChild(document.createElement("br"));
+    const range = document.createElement("span");
+    range.className = "dim";
+    range.textContent = fmtT(m[1]) + "–" + fmtT(m[2]) + (m[3] ? " · " + m[3] + " failed" : "");
+    td.appendChild(range);
+    return td;
+  }
+
+  function renderFull() {
+    const c = DEMO1[+select.value];
+    fullBody.replaceChildren();
+    FILES.forEach(function (f) {
+      const v = c.v[f];
+      const tr = document.createElement("tr");
+      const name = document.createElement("td");
+      name.textContent = FILE_LABEL[f];
+      tr.appendChild(name);
+      tr.appendChild(measureCell(v[0]));
+      tr.appendChild(measureCell(v[1]));
+      const ratio = document.createElement("td");
+      ratio.textContent = timedOut(v[1]) ? "≥ " + (60 / v[0][0]).toFixed(2) + "×" : (v[1][0] / v[0][0]).toFixed(2) + "×";
+      tr.appendChild(ratio);
+      tr.appendChild(measureCell(v[2]));
+      tr.appendChild(measureCell(v[3]));
+      fullBody.appendChild(tr);
+    });
+  }
+  select.addEventListener("change", renderFull);
+  select.value = "3";
+  renderFull();
+})();
+</script>

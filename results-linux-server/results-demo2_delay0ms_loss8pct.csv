@@ -1,0 +1,3 @@
+Scenario,Delay,Loss,Protocol,BatchCompletionTime_Sec,PerStreamAvgTime_Sec,FailedTransfers,MaxConnectionsPerBatch,Speedup
+Multi-Stream,0ms,8%,HTTP/2,21.7486,20.5702,0,1,Base
+Multi-Stream,0ms,8%,HTTP/3,3.9868,3.9510,0,1,5.46x

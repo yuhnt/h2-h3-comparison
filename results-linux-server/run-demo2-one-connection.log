@@ -1,0 +1,116 @@
+[0;32mFull run against 10.0.10.140: 5 server conditions[0m
+  0ms    0%   -> demo2
+  0ms    2%   -> demo2
+  0ms    4%   -> demo2
+  0ms    8%   -> demo2
+  0ms    12%  -> demo2
+
+[0;32m===== Condition 1/5: Delay=0ms Loss=0% (demo2) =====[0m
+ Container h2-vs-h3-netem-run-18bc64bc4efe Creating 
+ Container h2-vs-h3-netem-run-18bc64bc4efe Created 
+[0;36m➜ Server set to Delay=0ms Loss=0%[0m
+[0;32m✓ Server check: first byte 8ms, consistent with 0ms delay[0m
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m============================================================================[0m
+[0;32m   SCENARIO 2: MULTI-STREAM REQUEST (20 x 1MB) - HOL BLOCKING BENCHMARK[0m
+[0;32m   Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m   Server condition (label): Delay=0ms Loss=0%[0m
+[0;32m============================================================================[0m
+Proto   | Batch Time (s) | Per-Stream Avg (s) | Failed | Conns | Speedup
+------------------------------------------------------------------------------------
+HTTP/2  | 0.4508         | 0.2636             | 0      | 1     | Base
+HTTP/3  | 0.9639         | 0.6269             | 0      | 1     | 0.47x
+
+[0;32m✓ Scenario 2 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo2_delay0ms_loss0pct.csv[0m
+
+[0;32m===== Condition 2/5: Delay=0ms Loss=2% (demo2) =====[0m
+ Container h2-vs-h3-netem-run-72060c8f8003 Creating 
+ Container h2-vs-h3-netem-run-72060c8f8003 Created 
+[0;36m➜ Server set to Delay=0ms Loss=2%[0m
+[0;32m✓ Server check: first byte 5ms, consistent with 0ms delay[0m
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m============================================================================[0m
+[0;32m   SCENARIO 2: MULTI-STREAM REQUEST (20 x 1MB) - HOL BLOCKING BENCHMARK[0m
+[0;32m   Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m   Server condition (label): Delay=0ms Loss=2%[0m
+[0;32m============================================================================[0m
+Proto   | Batch Time (s) | Per-Stream Avg (s) | Failed | Conns | Speedup
+------------------------------------------------------------------------------------
+HTTP/2  | 1.7857         | 1.5358             | 0      | 1     | Base
+HTTP/3  | 2.2793         | 2.2433             | 0      | 1     | 0.78x
+
+[0;32m✓ Scenario 2 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo2_delay0ms_loss2pct.csv[0m
+
+[0;32m===== Condition 3/5: Delay=0ms Loss=4% (demo2) =====[0m
+ Container h2-vs-h3-netem-run-c2e15ac1c290 Creating 
+ Container h2-vs-h3-netem-run-c2e15ac1c290 Created 
+[0;36m➜ Server set to Delay=0ms Loss=4%[0m
+[0;32m✓ Server check: first byte 9ms, consistent with 0ms delay[0m
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m============================================================================[0m
+[0;32m   SCENARIO 2: MULTI-STREAM REQUEST (20 x 1MB) - HOL BLOCKING BENCHMARK[0m
+[0;32m   Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m   Server condition (label): Delay=0ms Loss=4%[0m
+[0;32m============================================================================[0m
+Proto   | Batch Time (s) | Per-Stream Avg (s) | Failed | Conns | Speedup
+------------------------------------------------------------------------------------
+HTTP/2  | 5.3057         | 4.9008             | 0      | 1     | Base
+HTTP/3  | 2.8701         | 2.8272             | 0      | 1     | 1.85x
+
+[0;32m✓ Scenario 2 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo2_delay0ms_loss4pct.csv[0m
+
+[0;32m===== Condition 4/5: Delay=0ms Loss=8% (demo2) =====[0m
+ Container h2-vs-h3-netem-run-a4b0c7c3b9bd Creating 
+ Container h2-vs-h3-netem-run-a4b0c7c3b9bd Created 
+[0;36m➜ Server set to Delay=0ms Loss=8%[0m
+[0;32m✓ Server check: first byte 5ms, consistent with 0ms delay[0m
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m============================================================================[0m
+[0;32m   SCENARIO 2: MULTI-STREAM REQUEST (20 x 1MB) - HOL BLOCKING BENCHMARK[0m
+[0;32m   Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m   Server condition (label): Delay=0ms Loss=8%[0m
+[0;32m============================================================================[0m
+Proto   | Batch Time (s) | Per-Stream Avg (s) | Failed | Conns | Speedup
+------------------------------------------------------------------------------------
+HTTP/2  | 21.7486        | 20.5702            | 0      | 1     | Base
+HTTP/3  | 3.9868         | 3.9510             | 0      | 1     | 5.46x
+
+[0;32m✓ Scenario 2 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo2_delay0ms_loss8pct.csv[0m
+
+[0;32m===== Condition 5/5: Delay=0ms Loss=12% (demo2) =====[0m
+ Container h2-vs-h3-netem-run-d63d7fdb7d86 Creating 
+ Container h2-vs-h3-netem-run-d63d7fdb7d86 Created 
+[0;36m➜ Server set to Delay=0ms Loss=12%[0m
+[0;32m✓ Server check: first byte 10ms, consistent with 0ms delay[0m
+[0;36mTesting connection to Server https://10.0.10.140:8443 ...[0m
+[0;32m✓ Server connection verified.[0m
+
+[0;32m============================================================================[0m
+[0;32m   SCENARIO 2: MULTI-STREAM REQUEST (20 x 1MB) - HOL BLOCKING BENCHMARK[0m
+[0;32m   Server: 10.0.10.140 (H2: 8443, H3: 8444) | Runs: 5[0m
+[0;32m   Server condition (label): Delay=0ms Loss=12%[0m
+[0;32m============================================================================[0m
+Proto   | Batch Time (s) | Per-Stream Avg (s) | Failed | Conns | Speedup
+------------------------------------------------------------------------------------
+HTTP/2  | 63.7198        | 61.2511            | 0      | 1     | Base
+HTTP/3  | 6.0503         | 6.0039             | 0      | 1     | 10.53x
+
+[0;32m✓ Scenario 2 Benchmark completed![0m
+Results saved to: [0;36m/home/kali/Desktop/master/advanced_network/client/results-demo2_delay0ms_loss12pct.csv[0m
+
+[0;32m✓ Full run completed. Results: /home/kali/Desktop/master/advanced_network/client/results-*.csv[0m
+ Container h2-vs-h3-netem-run-01c1a33ccea7 Creating 
+ Container h2-vs-h3-netem-run-01c1a33ccea7 Created 
+[0;32m✓ Server network reset[0m

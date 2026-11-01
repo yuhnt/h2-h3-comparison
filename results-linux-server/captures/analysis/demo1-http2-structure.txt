@@ -1,0 +1,147 @@
+### Frame 1: TCP SYN
+Transmission Control Protocol, Src Port: 51888, Dst Port: 8443, Seq: 0, Len: 0
+    Source Port: 51888
+    Destination Port: 8443
+        ..0. .... = RST: Absent
+        ...0 .... = FIN: Absent
+        .... 0... = Data: Absent
+        .... .0.. = ACK: Absent
+        .... ..0. = SYN-ACK: Absent
+        .... ...0 = SYN: Absent
+    Sequence Number: 0    (relative sequence number)
+    Sequence Number (raw): 631971224
+    Acknowledgment Number: 0
+    Acknowledgment number (raw): 0
+    1010 .... = Header Length: 40 bytes (10)
+    Flags: 0x002 (SYN)
+        000. .... .... = Reserved: Not set
+        ...0 .... .... = Accurate ECN: Not set
+        .... 0... .... = Congestion Window Reduced: Not set
+        .... .0.. .... = ECN-Echo: Not set
+        .... ..0. .... = Urgent: Not set
+        .... ...0 .... = Acknowledgment: Not set
+        .... .... 0... = Push: Not set
+        .... .... .0.. = Reset: Not set
+        .... .... ..1. = Syn: Set
+        .... .... ...0 = Fin: Not set
+    Window: 32120
+    Checksum: 0x8b82 [unverified]
+    Urgent Pointer: 0
+    Options: (20 bytes), Maximum segment size, SACK permitted, Timestamps, No-Operation (NOP), Window scale
+        TCP Option - Maximum segment size: 1460 bytes
+            Kind: Maximum Segment Size (2)
+            Length: 4
+            MSS Value: 1460
+        TCP Option - SACK permitted
+            Kind: SACK Permitted (4)
+            Length: 2
+        TCP Option - Timestamps: TSval 1370592599, TSecr 0
+            Kind: Time Stamp Option (8)
+            Length: 10
+            Timestamp value: 1370592599
+            Timestamp echo reply: 0
+        TCP Option - No-Operation (NOP)
+            Kind: No-Operation (1)
+        TCP Option - Window scale: 7 (multiply by 128)
+            Kind: Window Scale (3)
+
+### Frame 12: TLS Application Data chứa HTTP/2 Magic, SETTINGS, WINDOW_UPDATE, HEADERS (GET)
+Transport Layer Security
+    TLSv1.3 Record Layer: Application Data Protocol: HyperText Transfer Protocol 2
+        Opaque Type: Application Data (23)
+        Version: TLS 1.2 (0x0303)
+        Length: 142
+        Encrypted Application Data [truncated]: 58349b13f327a680672b148fdbde0213eaf585c16e6d2501ddd30abc743565318f3f421d821c43910815bb00dd96b9fce6946d72fbcccbf07b4613be9437c4a92dbaf31b739eec4d8896d1aaf9947d974708fb23dc5f706a6c9e4c591a18a4f1984a1e4
+HyperText Transfer Protocol 2
+    Stream: Magic
+        Magic: PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n
+HyperText Transfer Protocol 2
+    Stream: SETTINGS, Stream ID: 0, Length 18
+        Length: 18
+        Type: SETTINGS (4)
+        Flags: 0x00
+            0000 000. = Unused: 0x00
+            .... ...0 = ACK: False
+        0... .... .... .... .... .... .... .... = Reserved: 0x0
+        .000 0000 0000 0000 0000 0000 0000 0000 = Stream Identifier: 0
+        Settings - Max concurrent streams : 100
+            Settings Identifier: Max concurrent streams (3)
+            Max concurrent streams: 100
+        Settings - Initial Windows size : 65536
+            Settings Identifier: Initial Windows size (4)
+            Initial Window Size: 65536
+        Settings - Enable PUSH : 0
+            Settings Identifier: Enable PUSH (2)
+            Enable PUSH: 0
+HyperText Transfer Protocol 2
+    Stream: WINDOW_UPDATE, Stream ID: 0, Length 4
+        Length: 4
+        Type: WINDOW_UPDATE (8)
+        Flags: 0x00
+            0000 0000 = Unused: 0x00
+        0... .... .... .... .... .... .... .... = Reserved: 0x0
+        .000 0000 0000 0000 0000 0000 0000 0000 = Stream Identifier: 0
+        0... .... .... .... .... .... .... .... = Reserved: 0x0
+        .011 1110 0111 1111 0000 0000 0000 0001 = Window Size Increment: 1048510465
+HyperText Transfer Protocol 2
+    Stream: HEADERS, Stream ID: 1, Length 52, GET /resources/single/10kb.bin
+        Length: 52
+        Type: HEADERS (1)
+        Flags: 0x05, End Headers, End Stream
+            00.0 ..0. = Unused: 0x00
+            ..0. .... = Priority: False
+            .... 0... = Padded: False
+            .... .1.. = End Headers: True
+            .... ...1 = End Stream: True
+        0... .... .... .... .... .... .... .... = Reserved: 0x0
+        .000 0000 0000 0000 0000 0000 0000 0001 = Stream Identifier: 1
+        Header Block Fragment: 8287418c081702e102e168171e69a67f049362c2a0f6d842a1841aa9a82b010758d78cd57f7a8825b650c3cb85e5c153032a2f2a
+        Header: :method: GET
+            Name Length: 7
+            Name: :method
+            Value Length: 3
+            Value: GET
+            :method: GET
+            Representation: Indexed Header Field
+            Index: 2
+        Header: :scheme: https
+            Name Length: 7
+            Name: :scheme
+            Value Length: 5
+            Value: https
+            :scheme: https
+            Representation: Indexed Header Field
+            Index: 7
+        Header: :authority: 10.0.10.140:8443
+            Name Length: 10
+            Name: :authority
+            Value Length: 16
+            Value: 10.0.10.140:8443
+            :authority: 10.0.10.140:8443
+            Representation: Literal Header Field with Incremental Indexing - Indexed Name
+            Index: 1
+        Header: :path: /resources/single/10kb.bin
+            Name Length: 5
+            Name: :path
+            Value Length: 26
+            Value: /resources/single/10kb.bin
+            :path: /resources/single/10kb.bin
+            Representation: Literal Header Field without Indexing - Indexed Name
+            Index: 4
+        Header: user-agent: curl/8.18.0
+            Name Length: 10
+            Name: user-agent
+            Value Length: 11
+            Value: curl/8.18.0
+            user-agent: curl/8.18.0
+            Representation: Literal Header Field with Incremental Indexing - Indexed Name
+            Index: 58
+        Header: accept: */*
+            Name Length: 6
+            Name: accept
+            Value Length: 3
+            Value: */*
+            accept: */*
+            Representation: Literal Header Field with Incremental Indexing - Indexed Name
+            Index: 19
+
