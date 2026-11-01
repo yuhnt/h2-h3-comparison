@@ -1,0 +1,255 @@
+### Frame 1: QUIC Initial (Long Header) chứa ClientHello
+User Datagram Protocol, Src Port: 54132, Dst Port: 8444
+    Source Port: 54132
+    Destination Port: 8444
+    Length: 1208
+    Checksum: 0x22e2 [unverified]
+    UDP payload (1200 bytes)
+QUIC IETF
+    QUIC Connection information
+    1... .... = Header Form: Long Header (1)
+    .1.. .... = Fixed Bit: True
+    ..00 .... = Packet Type: Initial (0)
+    Version: 1 (0x00000001)
+    Destination Connection ID Length: 20
+    Destination Connection ID: 62035fb4c111f96aabfe49fbb03a592c9862d7d4
+    Source Connection ID Length: 20
+    Source Connection ID: 2c20a5773a0fc66a4396769faed79302addd7ed8
+    Token Length: 0
+    Length: 1148
+    Payload [truncated]: 9eae5f3f3432de98f029842a643055041011ddf16838ba2df9834cbea97287b2d8f35b84e87ee1c3e3142ef86688bfd276e6748c2207cac60516ec230b007c54e93c0edb8501da07f53e6d8c9e252a112c508e8635423677232aca87885e4e23d909a522e641bf5400f4a2f47e
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 807
+        Length: 135
+        Crypto Data
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 672
+        Length: 67
+        Crypto Data
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 134
+        Length: 67
+        Crypto Data
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 538
+        Length: 134
+        Crypto Data
+    PING
+        Frame Type: PING (0x0000000000000001)
+    PING
+        Frame Type: PING (0x0000000000000001)
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 235
+        Length: 34
+        Crypto Data
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 0
+        Length: 134
+        Crypto Data
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 201
+        Length: 34
+        Crypto Data
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 269
+        Length: 134
+        Crypto Data
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 739
+        Length: 68
+        Crypto Data
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 403
+        Length: 135
+        Crypto Data
+        TLSv1.3 Record Layer: Handshake Protocol: Client Hello (fragment)
+            Handshake Protocol: Client Hello (fragment)
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 942
+        Length: 135
+        Crypto Data
+
+### Frame 4: một UDP datagram chứa 2 gói QUIC (Initial + Handshake) – coalescing
+QUIC IETF
+    [Packet Length: 125]
+    1... .... = Header Form: Long Header (1)
+    ..00 .... = Packet Type: Initial (0)
+    [.... ..00 = Packet Number Length: 1 bytes (0)]
+    Destination Connection ID Length: 20
+    Source Connection ID Length: 20
+    Token Length: 0
+    Length: 75
+    [Packet Number: 1]
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Length: 54
+                Length: 1174
+                Session ID Length: 0
+                Extensions Length: 1134
+                    Length: 2
+                    Length: 1124
+                            Key Exchange Length: 1120
+QUIC IETF
+    [Packet Length: 1075]
+    1... .... = Header Form: Long Header (1)
+    ..10 .... = Packet Type: Handshake (2)
+    [.... ..00 = Packet Number Length: 1 bytes (0)]
+    Destination Connection ID Length: 20
+    Source Connection ID Length: 20
+    Length: 1026
+    [Packet Number: 0]
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+
+### Frame 9: QUIC 1-RTT (Short Header) chứa control stream SETTINGS + HEADERS 200 OK
+QUIC IETF
+    QUIC Connection information
+    QUIC Short Header DCID=2c20a5773a0fc66a4396769faed79302addd7ed8 PKN=0
+        0... .... = Header Form: Short Header (0)
+        .1.. .... = Fixed Bit: True
+        ..0. .... = Spin Bit: False
+        Destination Connection ID: 2c20a5773a0fc66a4396769faed79302addd7ed8
+        Protected Payload [truncated]: 68f57ad218442cf2a0273b4ad0ef035dd96140c5fcdf65ca69c7ab809a6a8de267f269d5c4fb7503cd68d1ddcb935eb805728df81f05eb03923551761d5d4f8d18112a4da14517a7abb7b068245ae0ac668019d79270c08d4e0ab544b3797efcb4395303f442d8c6
+    ACK
+        Frame Type: ACK (0x0000000000000002)
+        Largest Acknowledged: 2
+        ACK Delay: 0
+        ACK Range Count: 0
+        First ACK Range: 2
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 0
+        Length: 65
+        Crypto Data
+        TLSv1.3 Record Layer: Handshake Protocol: New Session Ticket
+            Handshake Protocol: New Session Ticket
+                Handshake Type: New Session Ticket (4)
+                Length: 61
+                TLS Session Ticket
+                    Session Ticket Lifetime Hint: 600 seconds (10 minutes)
+                    Session Ticket Age Add: 4149736678
+                    Session Ticket Nonce Length: 8
+                    Session Ticket Nonce: 0000000000000000
+                    Session Ticket Length: 32
+                    Session Ticket: 32ebdb4af807df0399736bd78930a1bfe2100a8fc11d019d03c84ef1837c6f54
+                    Extensions Length: 8
+                    Extension: early_data (len=4)
+                        Type: early_data (42)
+                        Length: 4
+                        Maximum Early Data Size: 4294967295
+    CRYPTO
+        Frame Type: CRYPTO (0x0000000000000006)
+        Offset: 65
+        Length: 65
+        Crypto Data
+        TLSv1.3 Record Layer: Handshake Protocol: New Session Ticket
+            Handshake Protocol: New Session Ticket
+                Handshake Type: New Session Ticket (4)
+                Length: 61
+                TLS Session Ticket
+                    Session Ticket Lifetime Hint: 600 seconds (10 minutes)
+                    Session Ticket Age Add: 29773757
+                    Session Ticket Nonce Length: 8
+                    Session Ticket Nonce: 0000000000000001
+                    Session Ticket Length: 32
+                    Session Ticket: dc06db356ce4a2fb41b0cb807c66927b543b9f5ce52e07bc8881e0503fcb971e
+                    Extensions Length: 8
+                    Extension: early_data (len=4)
+                        Type: early_data (42)
+                        Length: 4
+                        Maximum Early Data Size: 4294967295
+    HANDSHAKE_DONE
+        Frame Type: HANDSHAKE_DONE (0x000000000000001e)
+    NEW_CONNECTION_ID
+        Frame Type: NEW_CONNECTION_ID (0x0000000000000018)
+        Sequence: 1
+        Retire Prior To: 0
+        Connection ID Length: 20
+        Connection ID: 0000000000001004392bdbf22584ff09c04f8131
+        Stateless Reset Token: ed50828571236c429766af4bd53d99be
+    STREAM id=3 fin=0 off=0 len=1 dir=Unidirectional origin=Server-initiated
+        Frame Type: STREAM (0x000000000000000e)
+            .... ...0 = Fin: False
+            .... ..1. = Len(gth): True
+            .... .1.. = Off(set): True
+        Stream ID: 3
+            .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... ...1 = Stream initiator: Server-initiated (1)
+            .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... ..1. = Stream direction: Unidirectional (1)
+        Offset: 0
+        Length: 1
+        Stream Data: 00
+    STREAM id=3 fin=0 off=1 len=8 dir=Unidirectional origin=Server-initiated
+        Frame Type: STREAM (0x000000000000000e)
+            .... ...0 = Fin: False
+            .... ..1. = Len(gth): True
+            .... .1.. = Off(set): True
+        Stream ID: 3
+            .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... ...1 = Stream initiator: Server-initiated (1)
+            .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... ..1. = Stream direction: Unidirectional (1)
+        Offset: 1
+        Length: 8
+        Stream Data: 0406015000074080
+    STREAM id=7 fin=0 off=0 len=1 dir=Unidirectional origin=Server-initiated
+        Frame Type: STREAM (0x000000000000000e)
+            .... ...0 = Fin: False
+            .... ..1. = Len(gth): True
+            .... .1.. = Off(set): True
+        Stream ID: 7
+            .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... ...1 = Stream initiator: Server-initiated (1)
+            .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... ..1. = Stream direction: Unidirectional (1)
+        Offset: 0
+        Length: 1
+        Stream Data: 03
+    STREAM id=0 fin=0 off=0 len=950 dir=Bidirectional origin=Client-initiated
+        Frame Type: STREAM (0x000000000000000e)
+            .... ...0 = Fin: False
+            .... ..1. = Len(gth): True
+            .... .1.. = Off(set): True
+        Stream ID: 0
+            .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... ...0 = Stream initiator: Client-initiated (0)
+            .... .... .... .... .... .... .... .... .... .... .... .... .... .... .... ..0. = Stream direction: Bidirectional (0)
+        Offset: 0
+        Length: 950
+        Stream Data [truncated]: 01412c0000d95f4d89aa6355e580aec857735696df697e94038a6a22541004e2816ae32f5c69c53168df5f26901d75d0620d263d4c1c892a56426c28e9540531303234305a96c361be940854dc5ad41004e2816ee340b8d3aa62d1bf2b2a47378cfe5c18da102595613c00
+Hypertext Transfer Protocol Version 3
+    UNI STREAM: Control Stream off=0
+        Uni Stream Type: Control Stream (0x0000000000000000)
+Hypertext Transfer Protocol Version 3
+    Uni Stream
+        SETTINGS len=6
+            Type: SETTINGS (0x0000000000000004)
+            Length: 6
+            Frame Payload: 015000074080
+            Settings - Max Table Capacity: 4096
+                Settings Identifier: Max Table Capacity (0x0000000000000001)
+                Settings Value: 4096
+                Max Table Capacity: 4096
+            Settings - Blocked Streams: 128
+                Settings Identifier: Blocked Streams (0x0000000000000007)
+                Settings Value: 128
+                Blocked Streams: 128
+Hypertext Transfer Protocol Version 3
+    UNI STREAM: QPACK Decoder Stream off=0
+        Uni Stream Type: QPACK Decoder Stream (0x0000000000000003)
+Hypertext Transfer Protocol Version 3
+    Request Stream
+        HEADERS len=300, 200 OK
+            Type: HEADERS (0x0000000000000001)
+            Length: 300
+            Frame Payload [truncated]: 0000d95f4d89aa6355e580aec857735696df697e94038a6a22541004e2816ae32f5c69c53168df5f26901d75d0620d263d4c1c892a56426c28e9540531303234305a96c361be940854dc5ad41004e2816ee340b8d3aa62d1bf2b2a47378cfe5c18da102595613c007f3f
+            HTTP3 encoded headers - bytes 0x563365aaaab0 pos 0 len 300
+            Header: :status: 200 OK
+                Name Length: 7
+                Name: :status
+                Value Length: 3

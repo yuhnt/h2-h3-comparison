@@ -1,0 +1,17 @@
+Scenario,File,Delay,Loss,Client,Protocol,MedianTime_Sec,MeanTime_Sec,MinTime_Sec,MaxTime_Sec,FailedRuns
+Single-Stream,10kb.bin,0ms,2%,Curl,HTTP/2,0.0081,0.0084,0.0062,0.0101,0
+Single-Stream,10kb.bin,0ms,2%,Curl,HTTP/3,0.0125,0.0141,0.0073,0.0254,0
+Single-Stream,10kb.bin,0ms,2%,Wget2,HTTP/2,0.0050,0.0054,0.0050,0.0060,0
+Single-Stream,10kb.bin,0ms,2%,aioquic,HTTP/3,0.0236,0.0242,0.0161,0.0308,0
+Single-Stream,100kb.bin,0ms,2%,Curl,HTTP/2,0.0102,0.0100,0.0079,0.0122,0
+Single-Stream,100kb.bin,0ms,2%,Curl,HTTP/3,0.0115,0.0138,0.0097,0.0234,0
+Single-Stream,100kb.bin,0ms,2%,Wget2,HTTP/2,0.0110,0.0098,0.0080,0.0110,0
+Single-Stream,100kb.bin,0ms,2%,aioquic,HTTP/3,0.0415,0.0440,0.0297,0.0584,0
+Single-Stream,1mb.bin,0ms,2%,Curl,HTTP/2,0.0347,0.0390,0.0225,0.0784,0
+Single-Stream,1mb.bin,0ms,2%,Curl,HTTP/3,0.1180,0.1305,0.0975,0.1675,0
+Single-Stream,1mb.bin,0ms,2%,Wget2,HTTP/2,0.0280,0.0286,0.0220,0.0390,0
+Single-Stream,1mb.bin,0ms,2%,aioquic,HTTP/3,0.2684,0.2875,0.1668,0.4335,0
+Single-Stream,10mb.bin,0ms,2%,Curl,HTTP/2,0.6488,0.7999,0.3231,1.3459,0
+Single-Stream,10mb.bin,0ms,2%,Curl,HTTP/3,1.1696,1.1476,1.0380,1.2242,0
+Single-Stream,10mb.bin,0ms,2%,Wget2,HTTP/2,0.7100,0.6198,0.1900,1.1300,0
+Single-Stream,10mb.bin,0ms,2%,aioquic,HTTP/3,3.4827,3.4523,3.1541,3.7071,0
